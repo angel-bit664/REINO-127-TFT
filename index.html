@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REINO 127 - TFT</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+:root{--bg:#0b0e1a;--surface:#121525;--card:#151a30;--border:#1e2340;--muted:#8e93b0;--accent:#f5c518;--accent-d:rgba(245,197,24,.12);--green:#00ff88;--green-d:rgba(0,255,136,.12);--red:#ff5a5a;--red-d:rgba(255,59,59,.12);--yellow:#ffcc00;--yellow-d:rgba(255,204,0,.12);--blue:#64b4ff;--blue-d:rgba(100,180,255,.12)}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:#fff;font-family:Inter,sans-serif;min-height:100vh}
+#loginScreen{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;background:radial-gradient(ellipse at 30% 40%,rgba(245,197,24,.08) 0%,transparent 50%),var(--bg)}
+.login-card{background:rgba(21,26,48,.95);border:1px solid var(--border);border-radius:24px;padding:30px;width:92%;max-width:420px;text-align:center}
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.role-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px 6px;cursor:pointer;transition:.2s}
+.role-card.selected{border-color:var(--accent);background:var(--accent-d)}
+#pwdSection{max-height:0;overflow:hidden;opacity:0;transition:.4s}#pwdSection.show{max-height:200px;opacity:1}
+.pwd-input{width:100%;padding:11px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:#fff;text-align:center;margin-bottom:10px;outline:none}
+.login-btn{width:100%;padding:11px;background:linear-gradient(135deg,#f5c518,#ff8c00);border:none;border-radius:10px;color:#000;font-weight:900;cursor:pointer}
+.header{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(18,21,37,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.upload-zone{border:2px dashed var(--border);border-radius:14px;padding:18px;text-align:center;background:var(--surface);margin:14px 16px;cursor:pointer}
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 16px 12px}.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}.stat-label{font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase}.stat-value{font-size:19px;font-weight:900;margin-top:4px}
+.tabs-bar{display:flex;gap:6px;margin:0 16px 10px;flex-wrap:wrap}.tab-btn{padding:7px 12px;border-radius:9px;background:var(--card);border:1px solid var(--border);cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);display:flex;gap:5px;align-items:center}.tab-btn.active{background:var(--accent-d);color:var(--accent);border-color:rgba(245,197,24,.3)}
+.toolbar{display:flex;gap:6px;margin:0 16px 10px;flex-wrap:wrap}.search-wrap{position:relative;flex:1;min-width:200px}.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:11px}.search-input{width:100%;padding:8px 10px 8px 28px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px;outline:none}.search-input:focus{border-color:var(--accent)}.filter-sel{padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px}
+.btn-sm{padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}.btn-vs{background:rgba(245,197,24,.15);border-color:rgba(245,197,24,.3);color:#f5c518}.btn-discord{background:rgba(88,101,242,.15);border-color:rgba(88,101,242,.3);color:#949cf7}.btn-danger{color:var(--red)}.btn-export{background:rgba(0,255,136,.12);border-color:rgba(0,255,136,.3);color:var(--green)}.btn-settings{background:var(--blue-d);border-color:rgba(100,180,255,.3);color:var(--blue)}
+.table-container{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:0 16px 14px}.table-scroll{overflow:auto;max-height:58vh}table{width:100%;border-collapse:collapse;font-size:11px}th{background:var(--card);padding:9px 10px;text-align:left;color:var(--muted);font-size:8px;font-weight:700;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer}td{padding:8px 10px;border-top:1px solid rgba(30,35,64,.4);white-space:nowrap}tbody tr:hover{background:rgba(26,32,64,.6);cursor:pointer}
+.badge{padding:2px 8px;border-radius:10px;font-size:9px;font-weight:800;display:inline-block}.b-pelea{background:var(--green-d);color:var(--green)}.b-noaporta{background:var(--red-d);color:var(--red)}.b-nuevo{background:var(--yellow-d);color:var(--yellow)}.b-sefue{background:rgba(140,140,140,.12);color:#aaa}
+.poder-gold{color:var(--accent)!important;font-weight:900!important}
+.note-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);display:inline-block;margin-left:4px;box-shadow:0 0 6px rgba(100,180,255,.6)}
+.pagination{display:flex;justify-content:center;gap:4px;padding:10px;border-top:1px solid var(--border)}.pg-btn{width:28px;height:28px;display:grid;place-items:center;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer}.pg-btn.active{background:var(--accent-d);color:var(--accent)}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 14px}.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}.chart-title{font-weight:700;font-size:11px;color:var(--accent);margin-bottom:10px}.chart-wrap{height:240px;position:relative}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;place-items:center;z-index:9999;padding:16px}.modal-overlay.active{display:grid}.modal-content{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px;max-width:700px;width:100%;max-height:92vh;overflow:auto}
+.hidden{display:none!important}
+.detail-total-box{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.detail-total-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+.detail-canvas-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin:10px 0}
+.compare-input{width:100%;padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#fff;margin-bottom:8px}
+.files-panel{margin:0 16px 14px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.files-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer}
+.files-list{max-height:0;overflow:hidden;transition:.3s}.files-list.open{max-height:300px;overflow:auto}
+.file-row{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-top:1px solid var(--border);font-size:10px}
+.note-area{width:100%;padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px;resize:vertical;min-height:60px;margin:8px 0}
+.config-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.config-label{font-size:11px;color:var(--muted)}.config-input{width:120px;padding:7px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px;text-align:right}
+</style>
+</head>
+<body>
+<div id="loginScreen">
+  <div class="login-card">
+    <div style="font-size:40px;margin-bottom:10px">🛡️</div>
+    <div style="font-weight:900;font-size:24px;color:var(--accent)">REINO 127</div>
+    <div style="font-size:10px;color:var(--muted);margin:6px 0 18px;letter-spacing:2px">TFT • Call of Dragons</div>
+    <div class="role-grid">
+      <div class="role-card" data-role="miembro" onclick="selectRole('miembro')"><i class="fas fa-user"></i><div style="font-size:11px;font-weight:700">Miembro</div><div style="font-size:8px;color:var(--green)">LIBRE</div></div>
+      <div class="role-card" data-role="oficial" onclick="selectRole('oficial')"><i class="fas fa-shield"></i><div style="font-size:11px;font-weight:700">Oficial R4</div></div>
+      <div class="role-card" data-role="lider" onclick="selectRole('lider')"><i class="fas fa-crown"></i><div style="font-size:11px;font-weight:700">Lider R5</div></div>
+    </div>
+    <div id="pwdSection">
+      <input type="password" class="pwd-input" id="pwdInput" placeholder="CONTRASEÑA">
+      <button class="login-btn" onclick="doLogin()">ENTRAR</button>
+      <div id="loginError" style="font-size:11px;color:#ff5a5a;min-height:14px;margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+<div id="mainApp" class="hidden">
+  <header class="header">
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:42px;height:42px;border-radius:10px;background:var(--card);border:1px solid var(--border);display:grid;place-items:center">⚔️</div><div><div style="font-weight:900;color:var(--accent)">REINO 127</div><div style="font-size:9px;color:var(--muted)">TFT</div></div></div>
+    <div style="display:flex;align-items:center;gap:8px"><span id="roleBadge" style="font-size:10px;font-weight:700;padding:5px 10px;border-radius:20px;background:var(--card);border:1px solid var(--border)"></span><button onclick="doLogout()" style="width:32px;height:32px;background:var(--card);border:1px solid var(--border);border-radius:50%;color:var(--muted);cursor:pointer"><i class="fas fa-right-from-bracket"></i></button></div>
+  </header>
+  <div class="upload-zone" id="uploadZone"><div style="color:var(--accent);font-weight:700"><i class="fas fa-cloud-arrow-up"></i> Arrastra tu ZIP aquí o click</div><div id="fileInfo" style="margin-top:6px;color:var(--accent);font-size:10px;font-weight:700"></div><div id="memInfo" style="font-size:9px;color:var(--green);margin-top:4px"></div></div>
+  <div id="viewOnlyMsg" class="hidden" style="margin:14px 16px;padding:10px;background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.2);border-radius:10px;font-size:11px;color:#64b4ff;text-align:center"><i class="fas fa-eye"></i> Modo Miembro: Solo lectura</div>
+  <input type="file" id="fileInput" accept=".zip,.xlsx,.xls" multiple hidden>
+  <div class="files-panel oficial-only" id="filesPanel"><div class="files-header" onclick="toggleFilesPanel()"><div style="display:flex;align-items:center;gap:8px"><i class="fas fa-folder-open" style="color:var(--accent)"></i><span style="font-size:11px;font-weight:700">Archivos cargados</span><span id="fileCount" style="font-size:9px;color:var(--muted)">0</span></div><i class="fas fa-chevron-down" id="filesChevron" style="font-size:10px;color:var(--muted)"></i></div><div class="files-list" id="filesList"></div></div>
+  <div class="stats-grid"><div class="stat-card"><div class="stat-label">Jugadores 20M+</div><div class="stat-value" id="sJ">—</div></div><div class="stat-card"><div class="stat-label">Poder Total</div><div class="stat-value" id="sP">—</div></div><div class="stat-card"><div class="stat-label">Muertes</div><div class="stat-value" style="color:var(--red)" id="sD">—</div></div><div class="stat-card"><div class="stat-label">Merito Prom</div><div class="stat-value" style="color:var(--accent)" id="sMP">—</div></div><div class="stat-card"><div class="stat-label">Meritos Total</div><div class="stat-value" id="sMT">—</div></div></div>
+  <nav class="tabs-bar"><button class="tab-btn active" data-tab="jugadores" onclick="switchTab('jugadores')"><i class="fas fa-users"></i> Jugadores <span id="cAll">0</span></button><button class="tab-btn" data-tab="graficos" onclick="switchTab('graficos')"><i class="fas fa-chart-bar"></i> Gráficos</button><button class="tab-btn" data-tab="noaportan" onclick="switchTab('noaportan')"><i class="fas fa-circle-xmark"></i> No Aportan <span id="cNA">0</span></button><button class="tab-btn" data-tab="sefueron" onclick="switchTab('sefueron')"><i class="fas fa-door-open"></i> Se Fueron <span id="cSF">0</span></button></nav>
+  <section id="view-jugadores">
+    <div class="toolbar">
+      <div class="search-wrap"><i class="fas fa-magnifying-glass"></i><input class="search-input" id="searchInput" placeholder="Buscar por nombre o ID... (Ctrl+K)"></div>
+      <select class="filter-sel" id="filterEstado"><option value="all">Todos</option><option value="PELEA">Pelean</option><option value="NO APORTA">No aportan</option><option value="NUEVO">Nuevos</option><option value="SE FUE">Se fueron</option></select>
+      <select class="filter-sel" id="filterNota"><option value="all">Con/sin nota</option><option value="con">Con nota</option><option value="sin">Sin nota</option></select>
+      <button class="btn-sm btn-vs" onclick="openCompare()"><i class="fas fa-code-compare"></i> VS</button>
+      <button class="btn-sm btn-discord oficial-only" onclick="copyInactivos()"><i class="fab fa-discord"></i> Inactivos</button>
+      <button class="btn-sm btn-export oficial-only" onclick="exportFullReport()"><i class="fas fa-file-excel"></i> Exportar</button>
+      <button class="btn-sm btn-settings lider-only" onclick="openConfig()"><i class="fas fa-gear"></i></button>
+      <button class="btn-sm btn-danger lider-only" onclick="clearMemory()"><i class="fas fa-trash"></i> Limpiar</button>
+    </div>
+    <div class="table-container"><div class="table-scroll"><table><thead><tr><th data-col="rango">#</th><th data-col="name">Jugador</th><th data-col="id">ID</th><th data-col="poder">Poder</th><th data-col="meritos">Méritos</th><th data-col="muertes">Muertes</th><th>Estado</th></tr></thead><tbody id="tBody"></tbody></table></div><div class="pagination" id="pagination"></div></div>
+  </section>
+  <section id="view-graficos" class="hidden"><div class="charts-grid"><div class="chart-card"><div class="chart-title">Top 10 Méritos</div><div class="chart-wrap"><canvas id="chMeritos"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 15 Muertes</div><div class="chart-wrap"><canvas id="chMuertes"></canvas></div></div><div class="chart-card"><div class="chart-title">Distribución</div><div class="chart-wrap"><canvas id="chEstados"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Poder</div><div class="chart-wrap"><canvas id="chPoder"></canvas></div></div></div></section>
+  <div class="modal-overlay" id="modalOverlay"><div class="modal-content">
+    <div style="display:flex;justify-content:space-between"><div><div style="font-weight:900;font-size:18px;color:var(--accent)" id="mName"></div><div style="font-size:10px;color:var(--muted)" id="mId"></div></div><button onclick="closeModal()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div>
+    <div id="mStatus" style="padding:9px;border-radius:10px;font-weight:700;text-align:center;font-size:11px;margin:12px 0"></div>
+    <div id="mStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px"></div>
+    <div class="detail-total-box"><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Méritos Totales</div><div id="mTotalMeritos" style="font-weight:900;color:var(--accent);font-size:16px;margin-top:4px">0</div><div id="mTotalMeritosBreak" style="font-size:9px;color:var(--muted)"></div></div><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Muertes Totales</div><div id="mTotalMuertes" style="font-weight:900;color:var(--red);font-size:16px;margin-top:4px">0</div></div></div>
+    <div class="oficial-only"><div style="font-size:10px;font-weight:700;color:var(--blue)"><i class="fas fa-sticky-note"></i> NOTA</div><textarea class="note-area" id="noteArea" placeholder="Ej: Vacaciones..."></textarea><button onclick="saveNote()" style="padding:6px 14px;background:var(--blue-d);border:1px solid rgba(100,180,255,.3);border-radius:8px;color:var(--blue);font-size:10px;font-weight:700;cursor:pointer"><i class="fas fa-save"></i> Guardar nota</button></div>
+    <div class="detail-canvas-wrap"><canvas id="mChartMeritos" height="160"></canvas></div>
+    <div class="detail-canvas-wrap"><canvas id="mChartMuertes" height="160"></canvas></div>
+    <button id="btnExport" onclick="exportarJugadorExcel()" style="width:100%;margin:10px 0;padding:11px;background:linear-gradient(135deg,#00ff88,#00cc6a);border:none;border-radius:10px;color:#000;font-weight:900;cursor:pointer"><i class="fas fa-file-excel"></i> EXPORTAR <span id="mExportName"></span></button>
+    <div id="mHist" style="font-size:11px"></div>
+  </div></div>
+  <div class="modal-overlay" id="compareOverlay"><div class="modal-content" style="max-width:800px"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><div style="font-weight:900;color:var(--accent)"><i class="fas fa-code-compare"></i> COMPARADOR</div><button onclick="closeCompare()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label style="font-size:9px;color:var(--muted)">Jugador 1</label><select id="compare1" class="compare-input"></select></div><div><label style="font-size:9px;color:var(--muted)">Jugador 2</label><select id="compare2" class="compare-input"></select></div></div><button onclick="runCompare()" style="width:100%;padding:10px;background:var(--accent);border:none;border-radius:8px;color:#000;font-weight:900;cursor:pointer;margin:10px 0">⚔️ COMPARAR</button><div id="compareResult" class="hidden"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0" id="compareStats"></div><div class="detail-canvas-wrap"><canvas id="compareChartMeritos" height="180"></canvas></div><div id="compareWinner" style="padding:12px;border-radius:10px;text-align:center;font-weight:900;margin-top:10px"></div></div></div></div>
+  <div class="modal-overlay" id="configOverlay"><div class="modal-content" style="max-width:500px"><div style="display:flex;justify-content:space-between;margin-bottom:16px"><div style="font-weight:900;color:var(--accent)"><i class="fas fa-gear"></i> CONFIG</div><button onclick="closeConfig()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div><div class="config-row"><div class="config-label">Poder mínimo</div><input type="number" class="config-input" id="cfgPoderMin"></div><div class="config-row"><div class="config-label">Umbral No Aporta</div><input type="number" class="config-input" id="cfgUmbral"></div><div class="config-row"><div class="config-label">% mínimo</div><input type="number" class="config-input" id="cfgPct" step="0.1"></div><div class="config-row"><div class="config-label">Poder dorado</div><input type="number" class="config-input" id="cfgGold"></div><div class="config-row"><div class="config-label">Días para Se fue</div><input type="number" class="config-input" id="cfgDias"></div><button onclick="saveConfig()" style="width:100%;margin-top:14px;padding:11px;background:linear-gradient(135deg,#64b4ff,#3b82f6);border:none;border-radius:10px;color:#000;font-weight:900;cursor:pointer"><i class="fas fa-save"></i> GUARDAR</button></div></div>
+</div>
+<div id="toastBox" style="position:fixed;top:70px;right:16px;z-index:999999;display:flex;flex-direction:column;gap:6px"></div>
+<script>
+let config={poderMin:20000000,umbralNoAporta:100000,pctMinimo:12,poderGold:150000000,seFueDias:2};
+const PASS_MAP={miembro:'',oficial:'oficiales',lider:'r5'};
+const CREDS={miembro:{level:1,label:'Miembro'},oficial:{level:2,label:'Oficial'},lider:{level:3,label:'Líder'}};
+const PER_PAGE=50;
+let session=null,allData={},fileParsed=[],playerNotes={},computed=[],currentPage=1,sortCol='rango',sortDir='asc',charts={},modalCharts={},compareCharts={},currentModalId=null,selectedRole=null;
+let dbInstance=null;
+const DB_NAME='R127_DB_V5';
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    if(dbInstance){resolve(dbInstance);return;}
+    const req=indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains('store')) db.createObjectStore('store');
+    };
+    req.onsuccess=e=>{dbInstance=e.target.result;resolve(dbInstance);};
+    req.onerror=e=>reject(e);
+  });
+}
+async function idbSet(k,v){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('store','readwrite');
+    tx.objectStore('store').put(v,k);
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej();
+  });
+}
+async function idbGet(k){
+  const db=await openDB();
+  return new Promise(res=>{
+    const tx=db.transaction('store','readonly');
+    const rq=tx.objectStore('store').get(k);
+    rq.onsuccess=()=>res(rq.result);
+    rq.onerror=()=>res(null);
+  });
+}
+function esc(s){const d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
+function fmt(n){if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(Math.round(n));}
+function toast(m,t='info'){const c=document.getElementById('toastBox');const el=document.createElement('div');el.style.cssText='padding:9px 14px;background:#151a30;border:1px solid #1e2340;border-radius:10px;font-size:11px';el.style.borderLeft='3px solid '+(t==='success'?'#00ff88':t==='error'?'#ff5a5a':'#f5c518');el.textContent=m;c.appendChild(el);setTimeout(()=>el.remove(),3500);}
+async function saveToStorage(){
+  try{
+    await idbSet('allData',allData);
+    await idbSet('fileParsed',fileParsed);
+    await idbSet('playerNotes',playerNotes);
+    await idbSet('config',config);
+    const size=new Blob([JSON.stringify(allData)]).size;
+    document.getElementById('memInfo').textContent=`📦 IndexedDB OK: ${fileParsed.length} archivos - ${(size/1024/1024).toFixed(2)}MB`;
+  }catch(e){toast('Error guardando: '+e.message,'error');}
+}
+async function loadFromStorage(){
+  try{
+    const d=await idbGet('allData');
+    const f=await idbGet('fileParsed');
+    const n=await idbGet('playerNotes');
+    const c=await idbGet('config');
+    if(!d||!f) return false;
+    allData=d;
+    fileParsed=f.map(x=>({...x,date:new Date(x.date)}));
+    if(n) playerNotes=n;
+    if(c) config={...config,...c};
+    for(const id in allData){allData[id].history=allData[id].history.map(h=>({...h,date:new Date(h.date)}));}
+    if(Object.keys(allData).length>0){
+      analyze(true);
+      const size=new Blob([JSON.stringify(allData)]).size;
+      document.getElementById('memInfo').textContent=`📦 IndexedDB: ${fileParsed.length} archivos - ${(size/1024/1024).toFixed(2)}MB`;
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+async function clearMemory(){
+  if(session.role!=='lider'){toast('Solo R5','error');return;}
+  if(!confirm('¿Borrar TODO de IndexedDB?'))return;
+  indexedDB.deleteDatabase(DB_NAME);
+  localStorage.clear();
+  location.reload();
+}
+let filesOpen=false;
+function toggleFilesPanel(){filesOpen=!filesOpen;document.getElementById('filesList').classList.toggle('open',filesOpen);}
+function renderFilesList(){const list=document.getElementById('filesList');const sorted=[...fileParsed].sort((a,b)=>b.date-a.date);document.getElementById('fileCount').textContent=sorted.length+' archivos';let html='';sorted.forEach((f,i)=>{const idx=fileParsed.indexOf(f);html+=`<div class="file-row"><div><span style="color:var(--muted)">#${i+1}</span> <span style="font-weight:600">${esc(f.name)}</span></div><button onclick="deleteFile(${idx})" style="background:none;border:none;color:var(--red);cursor:pointer"><i class="fas fa-trash-can"></i></button></div>`;});list.innerHTML=html||'<div style="padding:14px;text-align:center;color:var(--muted);font-size:10px">Sin archivos</div>';}
+async function deleteFile(idx){
+  if(session.level<3){toast('Solo R5','error');return;}
+  const f=fileParsed[idx];if(!f)return;if(!confirm('¿Eliminar '+f.name+'?'))return;
+  for(const id in allData){allData[id].history=allData[id].history.filter(h=>h.fileName!==f.name);if(allData[id].history.length===0)delete allData[id];}
+  fileParsed.splice(idx,1);await saveToStorage();renderFilesList();analyze(true);toast('Eliminado','success');
+}
+function selectRole(r){selectedRole=r;document.querySelectorAll('.role-card').forEach(c=>c.classList.toggle('selected',c.dataset.role===r));if(r==='miembro'){session={role:r,level:1,t:Date.now()};sessionStorage.setItem('r127_session',JSON.stringify(session));enterApp();}else{document.getElementById('pwdSection').classList.add('show');}}
+document.getElementById('pwdInput').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+function doLogin(){if(!selectedRole)return;if(selectedRole==='miembro'){session={role:'miembro',level:1,t:Date.now()};sessionStorage.setItem('r127_session',JSON.stringify(session));enterApp();return;}const inp=document.getElementById('pwdInput').value.trim();if(inp===PASS_MAP[selectedRole]){session={role:selectedRole,level:CREDS[selectedRole].level,t:Date.now()};sessionStorage.setItem('r127_session',JSON.stringify(session));enterApp();}else{document.getElementById('loginError').textContent='Incorrecta - R4: oficiales / R5: r5';}}
+async function enterApp(){
+  document.getElementById('loginScreen').style.display='none';document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('roleBadge').textContent=CREDS[session.role].label;
+  const isMiembro=session.role==='miembro';
+  document.getElementById('uploadZone').classList.toggle('hidden',isMiembro);
+  document.getElementById('viewOnlyMsg').classList.toggle('hidden',!isMiembro);
+  document.querySelectorAll('.oficial-only').forEach(el=>el.classList.toggle('hidden',session.level<2));
+  document.querySelectorAll('.lider-only').forEach(el=>el.classList.toggle('hidden',session.role!=='lider'));
+  document.getElementById('btnExport').classList.toggle('hidden',isMiembro);
+  const loaded=await loadFromStorage();
+  if(!loaded){document.getElementById('memInfo').textContent=isMiembro?'Solo lectura - sin datos':'Sube tu ZIP (IndexedDB)';}
+  renderFilesList();
+}
+function doLogout(){session=null;sessionStorage.removeItem('r127_session');location.reload();}
+(async function(){const s=sessionStorage.getItem('r127_session');if(s){try{const j=JSON.parse(s);if(Date.now()-j.t<86400000){session=j;await enterApp();}}catch(e){}}})();
+const zone=document.getElementById('uploadZone'),fileInput=document.getElementById('fileInput');
+zone.addEventListener('click',()=>{if(session&&session.role!=='miembro')fileInput.click();});
+zone.addEventListener('dragover',e=>{e.preventDefault();if(session&&session.role!=='miembro')zone.classList.add('dragover');});
+zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
+zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragover');if(session&&session.role!=='miembro')handleFiles(e.dataTransfer.files);});
+fileInput.addEventListener('change',e=>{handleFiles(e.target.files);fileInput.value='';});
+async function handleFiles(files){
+  if(session.role==='miembro'){toast('Sin permisos','error');return;}
+  if(!files.length)return;
+  document.getElementById('fileInfo').textContent='Leyendo...';
+  let count=0;
+  for(const f of files){
+    try{
+      if(f.name.endsWith('.zip')){const zip=await JSZip.loadAsync(f);for(const n in zip.files){if(n.endsWith('.xlsx')||n.endsWith('.xls'))count+=parseExcel(await zip.files[n].async('arraybuffer'),n);}}
+      else{count+=parseExcel(await f.arrayBuffer(),f.name);}
+    }catch(e){}
+  }
+  document.getElementById('fileInfo').textContent=count+' registros';
+  if(Object.keys(allData).length>0){
+    analyze(false);
+    await saveToStorage();
+    renderFilesList();
+    toast(count+' registros guardados','success');
+  }
+}
+function parseExcel(buf,name){try{const wb=XLSX.read(buf,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws);if(!rows.length)return 0;const d=new Date(Date.now()+fileParsed.length*1000);fileParsed.push({name,date:d});let c=0;for(const r of rows){const id=String(r['ID de personaje']||r['ID']||'').trim();if(!id)continue;if(!allData[id])allData[id]={id,name:'?',history:[]};allData[id].name=r['Nombre de personaje']||r['Nombre']||allData[id].name||'?';allData[id].history.push({date:d,poder:Number(r['Poder actual']||r['Poder']||0)||0,muertes:Number(r['Muertes (T4/T5)']||r['Muertes']||0)||0,meritos:Number(r['Total de méritos']||r['Meritos']||0)||0,fileName:name});c++;}return c;}catch(e){return 0;}}
+// FIX SE FUERON - AHORA REVISA SI ESTA EN EL ULTIMO ARCHIVO
+function analyze(isLoad=false){
+  if(!Object.keys(allData).length)return;
+  fileParsed.sort((a,b)=>a.date-b.date);
+  const latestFileName = fileParsed[fileParsed.length-1]?.name;
+  computed=[];let tP=0,tM=0,tD=0;
+  for(const id in allData){
+    const h=allData[id].history.sort((a,b)=>a.date-b.date);
+    const last=h[h.length-1];
+    if(last.poder<config.poderMin)continue;
+    let dM=h.length>1?last.meritos-h[0].meritos:last.meritos;if(dM<0)dM=last.meritos;
+    let dD=h.length>1?last.muertes-h[0].muertes:last.muertes;if(dD<0)dD=last.muertes;
+    const estabaEnUltimo = h.some(x=>x.fileName===latestFileName);
+    const seFue=!estabaEnUltimo;
+    let st='PELEA';
+    if(seFue)st='SE FUE';
+    else if(h.length===1&&!isLoad)st='NUEVO';
+    else if(dM<config.umbralNoAporta)st='NO APORTA';
+    tP+=last.poder;tM+=dM;tD+=dD;
+    computed.push({id,name:allData[id].name,poder:last.poder,meritos:dM,muertes:dD,status:st,rango:0,history:h,seFue});
+  }
+  computed.sort((a,b)=>b.meritos-a.meritos);computed.forEach((c,i)=>c.rango=i+1);
+  document.getElementById('sJ').textContent=computed.filter(c=>c.status!=='SE FUE').length;
+  document.getElementById('sP').textContent=fmt(tP);document.getElementById('sD').textContent=fmt(tD);
+  document.getElementById('sMP').textContent=computed.length?fmt(tM/computed.length):'0';document.getElementById('sMT').textContent=fmt(tM);
+  document.getElementById('cAll').textContent=computed.length;
+  document.getElementById('cNA').textContent=computed.filter(c=>c.status==='NO APORTA').length;
+  document.getElementById('cSF').textContent=computed.filter(c=>c.status==='SE FUE').length;
+  currentPage=1;renderTable();fillCompareSelects();
+}
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
+  document.getElementById('view-jugadores').classList.add('hidden');document.getElementById('view-graficos').classList.add('hidden');
+  if(tab==='jugadores'){document.getElementById('view-jugadores').classList.remove('hidden');document.getElementById('filterEstado').value='all';}
+  else if(tab==='graficos'){document.getElementById('view-graficos').classList.remove('hidden');setTimeout(renderCharts,100);}
+  else if(tab==='noaportan'){document.getElementById('view-jugadores').classList.remove('hidden');document.getElementById('filterEstado').value='NO APORTA';}
+  else if(tab==='sefueron'){document.getElementById('view-jugadores').classList.remove('hidden');document.getElementById('filterEstado').value='SE FUE';}
+  currentPage=1;renderTable();
+}
+function getFiltered(){
+  let rows=[...computed];
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const fe=document.getElementById('filterEstado').value;
+  const fn=document.getElementById('filterNota').value;
+  if(q){ rows=rows.filter(r=> r.name.toLowerCase().includes(q) || r.id.toLowerCase().includes(q) ); }
+  if(fe!=='all')rows=rows.filter(r=>r.status===fe);
+  if(fn==='con')rows=rows.filter(r=>playerNotes[r.id]&&playerNotes[r.id].trim());
+  else if(fn==='sin')rows=rows.filter(r=>!playerNotes[r.id]||!playerNotes[r.id].trim());
+  rows.sort((a,b)=>{let va=a[sortCol],vb=b[sortCol];if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}return va<vb?(sortDir==='asc'?-1:1):va>vb?(sortDir==='asc'?1:-1):0;});
+  return rows;
+}
+let st;document.getElementById('searchInput').addEventListener('input',()=>{clearTimeout(st);st=setTimeout(()=>{currentPage=1;renderTable();},200);});
+document.getElementById('filterEstado').addEventListener('change',()=>{currentPage=1;renderTable();});
+document.getElementById('filterNota').addEventListener('change',()=>{currentPage=1;renderTable();});
+document.querySelectorAll('th[data-col]').forEach(th=>{th.addEventListener('click',()=>{const c=th.dataset.col;if(sortCol===c)sortDir=sortDir==='asc'?'desc':'asc';else{sortCol=c;sortDir='asc';}currentPage=1;renderTable();});});
+function renderTable(){
+  const rows=getFiltered();const tp=Math.max(1,Math.ceil(rows.length/PER_PAGE));if(currentPage>tp)currentPage=tp;
+  const page=rows.slice((currentPage-1)*PER_PAGE,(currentPage-1)*PER_PAGE+PER_PAGE);
+  let html='';for(const r of page){let bc=r.status==='PELEA'?'b-pelea':r.status==='NO APORTA'?'b-noaporta':r.status==='NUEVO'?'b-nuevo':'b-sefue';const isGold=r.poder>=config.poderGold;const noteDot=playerNotes[r.id]&&playerNotes[r.id].trim()?'<span class="note-dot"></span>':'';html+=`<tr data-id="${esc(r.id)}"><td style="font-weight:900;color:${r.rango<=3?'#f5c518':'#8e93b0'}">${r.rango}</td><td style="font-weight:700" class="${isGold?'poder-gold':''}">${esc(r.name)}${noteDot}</td><td style="font-size:9px;color:var(--muted);font-family:monospace" title="${esc(r.id)}">${esc(r.id.slice(-8))}</td><td class="${isGold?'poder-gold':''}">${fmt(r.poder)}</td><td>${fmt(r.meritos)}</td><td>${fmt(r.muertes)}</td><td><span class="badge ${bc}">${esc(r.status)}</span></td></tr>`;}
+  document.getElementById('tBody').innerHTML=html||`<tr><td colspan=7 style="text-align:center;padding:30px;color:#8e93b0">Sin resultados</td></tr>`;
+  document.querySelectorAll('#tBody tr[data-id]').forEach(tr=>tr.addEventListener('click',()=>openModal(tr.dataset.id)));
+  const pag=document.getElementById('pagination');if(tp<=1){pag.innerHTML='';return;}let pp=`<button class="pg-btn" onclick="goP(${currentPage-1})"><</button>`;for(let i=1;i<=Math.min(tp,7);i++){pp+=`<button class="pg-btn ${i===currentPage?'active':''}" onclick="goP(${i})">${i}</button>`;}pp+=`<button class="pg-btn" onclick="goP(${currentPage+1})">></button>`;pag.innerHTML=pp;
+}
+function goP(p){const rows=getFiltered();const tp=Math.max(1,Math.ceil(rows.length/PER_PAGE));if(p<1||p>tp)return;currentPage=p;renderTable();}
+function copyInactivos(){if(session.level<2){toast('Solo R4 y R5','error');return;}const inactivos=computed.filter(c=>c.status==='NO APORTA');let txt=`🚨 NO APORTAN - ${inactivos.length}:\n`;inactivos.forEach((p,i)=>{txt+=`${i+1}. ${p.name} [${p.id}] - ${fmt(p.poder)}\n`;});navigator.clipboard.writeText(txt).then(()=>toast('Copiado'));}
+function exportFullReport(){if(session.level<2){toast('Solo R4 y R5','error');return;}const data=computed.map(c=>({'#':c.rango,'Nombre':c.name,'ID':c.id,'Poder':c.poder,'Méritos':c.meritos,'Muertes':c.muertes,'%':(c.meritos/c.poder*100).toFixed(2)+'%','Estado':c.status,'Nota':playerNotes[c.id]||''}));const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Reporte');XLSX.writeFile(wb,`REINO127_Reporte_${new Date().toISOString().slice(0,10)}.xlsx`);}
+function renderCharts(){if(!computed.length)return;Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};const t10m=computed.slice(0,10);charts.meritos=new Chart(document.getElementById('chMeritos'),{type:'bar',data:{labels:t10m.map(r=>r.name),datasets:[{data:t10m.map(r=>r.meritos),backgroundColor:'#f5c518',borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});const t15d=[...computed].sort((a,b)=>b.muertes-a.muertes).slice(0,15);charts.muertes=new Chart(document.getElementById('chMuertes'),{type:'bar',data:{labels:t15d.map(r=>r.name),datasets:[{data:t15d.map(r=>r.muertes),backgroundColor:'#ff5a5a',borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});const est={PELEA:0,'NO APORTA':0,NUEVO:0,'SE FUE':0};computed.forEach(c=>est[c.status]++);charts.estados=new Chart(document.getElementById('chEstados'),{type:'doughnut',data:{labels:Object.keys(est),datasets:[{data:Object.values(est),backgroundColor:['#00ff88','#ff5a5a','#ffcc00','#aaa']}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%'}});const t10p=[...computed].sort((a,b)=>b.poder-a.poder).slice(0,10);charts.poder=new Chart(document.getElementById('chPoder'),{type:'bar',data:{labels:t10p.map(r=>r.name),datasets:[{data:t10p.map(r=>r.poder),backgroundColor:'#64b4ff',borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});}
+function openModal(id){
+  currentModalId=id;const p=computed.find(c=>c.id===id);if(!p)return;
+  document.getElementById('mName').textContent=p.name;document.getElementById('mId').textContent='ID: '+p.id;document.getElementById('mExportName').textContent=p.name.toUpperCase();
+  const se=document.getElementById('mStatus');se.textContent=p.seFue?'🚪 SE FUE':'✅ EN REINO 127';se.style.background=p.seFue?'rgba(255,90,90,.15)':'rgba(0,255,136,.15)';se.style.color=p.seFue?'#ff5a5a':'#00ff88';
+  const histSorted=[...p.history].sort((a,b)=>a.date-b.date);
+  let labels=[], dMArr=[], dMuArr=[], acumMArr=[];let acumM=0,acumD=0, porKvK=0,porDias=0;
+  histSorted.forEach((h,i)=>{let dM=i===0?h.meritos:h.meritos-histSorted[i-1].meritos;let dMu=i===0?h.muertes:h.muertes-histSorted[i-1].muertes;if(dM<0)dM=0;if(dMu<0)dMu=0;labels.push(h.fileName.replace('.xlsx','').slice(0,15));dMArr.push(dM);dMuArr.push(dMu);acumM+=dM;acumD+=dMu;acumMArr.push(acumM);if(h.fileName.toLowerCase().includes('kvk')||h.fileName.toLowerCase().includes('semana'))porKvK+=dM;else porDias+=dM;});
+  let pct=p.poder>0?(acumM/p.poder*100):0, cumple=pct>=config.pctMinimo;
+  document.getElementById('mStats').innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Poder</div><div style="font-weight:900">${fmt(p.poder)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Méritos Totales</div><div style="font-weight:900;color:var(--accent)">${fmt(acumM)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Muertes Totales</div><div style="font-weight:900;color:var(--red)">${fmt(acumD)}</div></div><div style="background:${cumple?'rgba(0,255,136,.12)':'rgba(255,90,90,.12)'};border:1px solid ${cumple?'#00ff88':'#ff5a5a'};border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">% Poder</div><div style="font-weight:900;color:${cumple?'#00ff88':'#ff5a5a'}">${pct.toFixed(2)}%</div><div style="font-size:7px">${cumple?'✅ CUMPLE':'❌ Falta '+(config.pctMinimo-pct).toFixed(1)+'%'}</div></div>`;
+  document.getElementById('mTotalMeritos').textContent=fmt(acumM);document.getElementById('mTotalMeritosBreak').textContent=`KvK:${fmt(porKvK)} Días:${fmt(porDias)} ${pct.toFixed(2)}%`;document.getElementById('mTotalMuertes').textContent=fmt(acumD);
+  document.getElementById('noteArea').value=playerNotes[id]||'';
+  let hhtml='';for(let i=histSorted.length-1;i>=0;i--){const h=histSorted[i];let dM=i===0?h.meritos:h.meritos-histSorted[i-1].meritos;let dMu=i===0?h.muertes:h.muertes-histSorted[i-1].muertes;if(dM<0)dM=0;if(dMu<0)dMu=0;hhtml+=`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(30,35,64,.5)"><div><div style="font-weight:700;font-size:11px">${esc(h.fileName)}</div><div style="font-size:9px;color:var(--muted)">${h.date.toLocaleDateString()}</div></div><div style="text-align:right"><div style="color:var(--accent);font-weight:700">+${fmt(dM)}</div><div style="color:var(--red);font-size:10px">+${fmt(dMu)}</div></div></div>`;}document.getElementById('mHist').innerHTML=hhtml;
+  Object.values(modalCharts).forEach(c=>{try{c.destroy();}catch(e){}});modalCharts={};
+  setTimeout(()=>{modalCharts.meritos=new Chart(document.getElementById('mChartMeritos'),{type:'line',data:{labels:labels,datasets:[{label:'Día',data:dMArr,borderColor:'#f5c518',backgroundColor:'rgba(245,197,24,.2)',fill:true},{label:'Acumulado',data:acumMArr,borderColor:'#f5c518',borderDash:[5,5],fill:false,pointRadius:0}]},options:{responsive:true}});modalCharts.muertes=new Chart(document.getElementById('mChartMuertes'),{type:'bar',data:{labels:labels,datasets:[{data:dMuArr,backgroundColor:'#ff5a5a'}]},options:{responsive:true,plugins:{legend:{display:false}}}});},100);
+  document.getElementById('modalOverlay').classList.add('active');
+}
+async function saveNote(){if(!currentModalId)return;if(session.level<2){toast('Solo R4+','error');return;}const text=document.getElementById('noteArea').value.trim();if(text)playerNotes[currentModalId]=text;else delete playerNotes[currentModalId];await saveToStorage();renderTable();toast('Nota guardada','success');}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('active');}
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target.id==='modalOverlay')closeModal();});
+function exportarJugadorExcel(){if(session.role==='miembro'){toast('Solo R4 y R5','error');return;}if(!currentModalId)return;const p=computed.find(c=>c.id===currentModalId);const hist=[...p.history].sort((a,b)=>a.date-b.date);let acumM=0,acumD=0;const data=[];hist.forEach((h,i)=>{let dM=i===0?h.meritos:h.meritos-hist[i-1].meritos;let dMu=i===0?h.muertes:h.muertes-hist[i-1].muertes;if(dM<0)dM=0;if(dMu<0)dMu=0;acumM+=dM;acumD+=dMu;data.push({"ID":p.id,"Nombre":p.name,"Archivo":h.fileName,"Méritos +":dM,"Muertes +":dMu,"Acum Méritos":acumM,"Acum Muertes":acumD,"Poder":h.poder,"%":(acumM/h.poder*100).toFixed(2)+"%"});});const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Historial");XLSX.writeFile(wb,`REINO127_${p.name}_${p.id}.xlsx`);}
+function fillCompareSelects(){const s1=document.getElementById('compare1'), s2=document.getElementById('compare2');if(!s1)return;s1.innerHTML='';s2.innerHTML='';computed.forEach(p=>{s1.innerHTML+=`<option value="${p.id}">${p.name} [${p.id.slice(-6)}]</option>`;s2.innerHTML+=`<option value="${p.id}">${p.name} [${p.id.slice(-6)}]</option>`;});if(computed[1])s2.selectedIndex=1;}
+function openCompare(){fillCompareSelects();document.getElementById('compareOverlay').classList.add('active');}
+function closeCompare(){document.getElementById('compareOverlay').classList.remove('active');}
+function runCompare(){
+  const id1=document.getElementById('compare1').value, id2=document.getElementById('compare2').value;
+  if(id1===id2){toast('Elige 2 diferentes','error');return;}
+  const p1=computed.find(c=>c.id===id1), p2=computed.find(c=>c.id===id2);
+  const h1=[...p1.history].sort((a,b)=>a.date-b.date), h2=[...p2.history].sort((a,b)=>a.date-b.date);
+  let acum1M=0,acum2M=0;let map1={},map2={};
+  h1.forEach((h,i)=>{let dM=i===0?h.meritos:h.meritos-h1[i-1].meritos;if(dM<0)dM=0;map1[h.fileName]={m:dM};acum1M+=dM;});
+  h2.forEach((h,i)=>{let dM=i===0?h.meritos:h.meritos-h2[i-1].meritos;if(dM<0)dM=0;map2[h.fileName]={m:dM};acum2M+=dM;});
+  let allFiles=[...new Set([...h1.map(x=>x.fileName),...h2.map(x=>x.fileName)])].sort();
+  let data1M=allFiles.map(f=>map1[f]?.m||0), data2M=allFiles.map(f=>map2[f]?.m||0);
+  document.getElementById('compareStats').innerHTML=`<div style="background:var(--card);border-radius:10px;padding:10px;text-align:center"><div style="font-weight:900;color:var(--accent)">${esc(p1.name)}</div><div style="font-size:9px;color:var(--muted)">${p1.id}</div><div style="font-size:11px;margin-top:4px">Méritos:${fmt(acum1M)}</div></div><div style="background:var(--card);border-radius:10px;padding:10px;text-align:center"><div style="font-weight:900;color:#64b4ff">${esc(p2.name)}</div><div style="font-size:9px;color:var(--muted)">${p2.id}</div><div style="font-size:11px;margin-top:4px">Méritos:${fmt(acum2M)}</div></div>`;
+  document.getElementById('compareWinner').textContent=acum1M>acum2M?`🏆 ${p1.name} gana`:`🏆 ${p2.name} gana`;
+  Object.values(compareCharts).forEach(c=>{try{c.destroy();}catch(e){}});compareCharts={};document.getElementById('compareResult').classList.remove('hidden');
+  setTimeout(()=>{compareCharts.m=new Chart(document.getElementById('compareChartMeritos'),{type:'line',data:{labels:allFiles.map(f=>f.slice(0,12)),datasets:[{label:p1.name,data:data1M,borderColor:'#f5c518'},{label:p2.name,data:data2M,borderColor:'#64b4ff'}]},options:{responsive:true}});},150);
+}
+function openConfig(){if(session.role!=='lider'){toast('Solo R5','error');return;}document.getElementById('cfgPoderMin').value=config.poderMin;document.getElementById('cfgUmbral').value=config.umbralNoAporta;document.getElementById('cfgPct').value=config.pctMinimo;document.getElementById('cfgGold').value=config.poderGold;document.getElementById('cfgDias').value=config.seFueDias;document.getElementById('configOverlay').classList.add('active');}
+function closeConfig(){document.getElementById('configOverlay').classList.remove('active');}
+document.getElementById('configOverlay').addEventListener('click',e=>{if(e.target.id==='configOverlay')closeConfig();});
+async function saveConfig(){
+  const pm=parseInt(document.getElementById('cfgPoderMin').value);
+  const um=parseInt(document.getElementById('cfgUmbral').value);
+  const pc=parseFloat(document.getElementById('cfgPct').value);
+  const go=parseInt(document.getElementById('cfgGold').value);
+  const di=parseInt(document.getElementById('cfgDias').value);
+  if(isNaN(pm)||isNaN(um)||isNaN(pc)||isNaN(go)||isNaN(di)){toast('Valores inválidos','error');return;}
+  config.poderMin=pm;config.umbralNoAporta=um;config.pctMinimo=pc;config.poderGold=go;config.seFueDias=di;
+  await saveToStorage();analyze(true);closeConfig();toast('Config guardada','success');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('modalOverlay').classList.contains('active')) closeModal();
+    else if (document.getElementById('compareOverlay').classList.contains('active')) closeCompare();
+    else if (document.getElementById('configOverlay').classList.contains('active')) closeConfig();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+    document.getElementById('searchInput').select();
+  }
+});
+</script>
+</body>
+</html>
