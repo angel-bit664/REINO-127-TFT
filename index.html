@@ -43,6 +43,7 @@
 .note-area{width:100%;padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px;resize:vertical;min-height:60px;margin:8px 0}
 .config-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
 .config-label{font-size:11px;color:var(--muted)}.config-input{width:120px;padding:7px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px;text-align:right}
+@media(max-width:800px){.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.detail-total-box{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -72,7 +73,7 @@
   <div id="viewOnlyMsg" class="hidden" style="margin:14px 16px;padding:10px;background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.2);border-radius:10px;font-size:11px;color:#64b4ff;text-align:center"><i class="fas fa-eye"></i> Modo Miembro: Solo lectura</div>
   <input type="file" id="fileInput" accept=".zip,.xlsx,.xls" multiple hidden>
   <div class="files-panel oficial-only" id="filesPanel"><div class="files-header" onclick="toggleFilesPanel()"><div style="display:flex;align-items:center;gap:8px"><i class="fas fa-folder-open" style="color:var(--accent)"></i><span style="font-size:11px;font-weight:700">Archivos cargados</span><span id="fileCount" style="font-size:9px;color:var(--muted)">0</span></div><i class="fas fa-chevron-down" id="filesChevron" style="font-size:10px;color:var(--muted)"></i></div><div class="files-list" id="filesList"></div></div>
-  <div class="stats-grid"><div class="stat-card"><div class="stat-label">Jugadores 20M+</div><div class="stat-value" id="sJ">—</div></div><div class="stat-card"><div class="stat-label">Poder Total</div><div class="stat-value" id="sP">—</div></div><div class="stat-card"><div class="stat-label">Muertes</div><div class="stat-value" style="color:var(--red)" id="sD">—</div></div><div class="stat-card"><div class="stat-label">Merito Prom</div><div class="stat-value" style="color:var(--accent)" id="sMP">—</div></div><div class="stat-card"><div class="stat-label">Meritos Total</div><div class="stat-value" id="sMT">—</div></div></div>
+  <div class="stats-grid"><div class="stat-card"><div class="stat-label">Jugadores 20M+</div><div class="stat-value" id="sJ">—</div></div><div class="stat-card"><div class="stat-label">Poder Total</div><div class="stat-value" id="sP">—</div></div><div class="stat-card"><div class="stat-label">Muertes</div><div class="stat-value" style="color:var(--red)" id="sD">—</div></div><div class="stat-card"><div class="stat-label">Mérito Prom</div><div class="stat-value" style="color:var(--accent)" id="sMP">—</div></div><div class="stat-card"><div class="stat-label">Méritos Total</div><div class="stat-value" id="sMT">—</div></div><div class="stat-card"><div class="stat-label">Construcción</div><div class="stat-value" style="color:var(--blue)" id="sC">—</div></div><div class="stat-card"><div class="stat-label">Destrucción</div><div class="stat-value" style="color:var(--red)" id="sX">—</div></div></div>
   <nav class="tabs-bar"><button class="tab-btn active" data-tab="jugadores" onclick="switchTab('jugadores')"><i class="fas fa-users"></i> Jugadores <span id="cAll">0</span></button><button class="tab-btn" data-tab="graficos" onclick="switchTab('graficos')"><i class="fas fa-chart-bar"></i> Gráficos</button><button class="tab-btn" data-tab="noaportan" onclick="switchTab('noaportan')"><i class="fas fa-circle-xmark"></i> No Aportan <span id="cNA">0</span></button><button class="tab-btn" data-tab="sefueron" onclick="switchTab('sefueron')"><i class="fas fa-door-open"></i> Se Fueron <span id="cSF">0</span></button></nav>
   <section id="view-jugadores">
     <div class="toolbar">
@@ -87,15 +88,17 @@
     </div>
     <div class="table-container"><div class="table-scroll"><table><thead><tr><th data-col="rango">#</th><th data-col="name">Jugador</th><th data-col="id">ID</th><th data-col="poder">Poder</th><th data-col="meritos">Méritos</th><th data-col="muertes">Muertes</th><th>Estado</th></tr></thead><tbody id="tBody"></tbody></table></div><div class="pagination" id="pagination"></div></div>
   </section>
-  <section id="view-graficos" class="hidden"><div class="charts-grid"><div class="chart-card"><div class="chart-title">Top 10 Méritos</div><div class="chart-wrap"><canvas id="chMeritos"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 15 Muertes</div><div class="chart-wrap"><canvas id="chMuertes"></canvas></div></div><div class="chart-card"><div class="chart-title">Distribución</div><div class="chart-wrap"><canvas id="chEstados"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Poder</div><div class="chart-wrap"><canvas id="chPoder"></canvas></div></div></div></section>
+  <section id="view-graficos" class="hidden"><div class="charts-grid"><div class="chart-card"><div class="chart-title">Top 10 Méritos</div><div class="chart-wrap"><canvas id="chMeritos"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 15 Muertes</div><div class="chart-wrap"><canvas id="chMuertes"></canvas></div></div><div class="chart-card"><div class="chart-title">Distribución</div><div class="chart-wrap"><canvas id="chEstados"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Poder</div><div class="chart-wrap"><canvas id="chPoder"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Construcción</div><div class="chart-wrap"><canvas id="chConstruccion"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Destrucción</div><div class="chart-wrap"><canvas id="chDestruccion"></canvas></div></div></div></section>
   <div class="modal-overlay" id="modalOverlay"><div class="modal-content">
     <div style="display:flex;justify-content:space-between"><div><div style="font-weight:900;font-size:18px;color:var(--accent)" id="mName"></div><div style="font-size:10px;color:var(--muted)" id="mId"></div></div><button onclick="closeModal()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div>
     <div id="mStatus" style="padding:9px;border-radius:10px;font-weight:700;text-align:center;font-size:11px;margin:12px 0"></div>
     <div id="mStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px"></div>
-    <div class="detail-total-box"><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Méritos Totales</div><div id="mTotalMeritos" style="font-weight:900;color:var(--accent);font-size:16px;margin-top:4px">0</div><div id="mTotalMeritosBreak" style="font-size:9px;color:var(--muted)"></div></div><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Muertes Totales</div><div id="mTotalMuertes" style="font-weight:900;color:var(--red);font-size:16px;margin-top:4px">0</div></div></div>
+    <div class="detail-total-box"><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Méritos Totales</div><div id="mTotalMeritos" style="font-weight:900;color:var(--accent);font-size:16px;margin-top:4px">0</div><div id="mTotalMeritosBreak" style="font-size:9px;color:var(--muted)"></div></div><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Muertes Totales</div><div id="mTotalMuertes" style="font-weight:900;color:var(--red);font-size:16px;margin-top:4px">0</div></div><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Construcción</div><div id="mTotalConstruccion" style="font-weight:900;color:var(--blue);font-size:16px;margin-top:4px">0</div></div><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Destrucción</div><div id="mTotalDestruccion" style="font-weight:900;color:var(--red);font-size:16px;margin-top:4px">0</div></div></div>
     <div class="oficial-only"><div style="font-size:10px;font-weight:700;color:var(--blue)"><i class="fas fa-sticky-note"></i> NOTA</div><textarea class="note-area" id="noteArea" placeholder="Ej: Vacaciones..."></textarea><button onclick="saveNote()" style="padding:6px 14px;background:var(--blue-d);border:1px solid rgba(100,180,255,.3);border-radius:8px;color:var(--blue);font-size:10px;font-weight:700;cursor:pointer"><i class="fas fa-save"></i> Guardar nota</button></div>
-    <div class="detail-canvas-wrap"><canvas id="mChartMeritos" height="160"></canvas></div>
-    <div class="detail-canvas-wrap"><canvas id="mChartMuertes" height="160"></canvas></div>
+    <div class="detail-canvas-wrap"><div class="chart-title">Méritos por día</div><canvas id="mChartMeritos" height="160"></canvas></div>
+    <div class="detail-canvas-wrap"><div class="chart-title">Muertes por día</div><canvas id="mChartMuertes" height="160"></canvas></div>
+    <div class="detail-canvas-wrap"><div class="chart-title">Construcción y destrucción por día</div><canvas id="mChartTiempo" height="160"></canvas></div>
+    <div class="detail-canvas-wrap"><div class="chart-title">Méritos por tipo de tropa</div><canvas id="mChartTropas" height="180"></canvas><div id="troopBreakdown" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px"></div></div>
     <button id="btnExport" onclick="exportarJugadorExcel()" style="width:100%;margin:10px 0;padding:11px;background:linear-gradient(135deg,#00ff88,#00cc6a);border:none;border-radius:10px;color:#000;font-weight:900;cursor:pointer"><i class="fas fa-file-excel"></i> EXPORTAR <span id="mExportName"></span></button>
     <div id="mHist" style="font-size:11px"></div>
   </div></div>
@@ -110,7 +113,7 @@ const CREDS={miembro:{level:1,label:'Miembro'},oficial:{level:2,label:'Oficial'}
 const PER_PAGE=50;
 let session=null,allData={},fileParsed=[],playerNotes={},computed=[],currentPage=1,sortCol='rango',sortDir='asc',charts={},modalCharts={},compareCharts={},currentModalId=null,selectedRole=null;
 let dbInstance=null;
-const DB_NAME='R127_DB_V5';
+const DB_NAME='R127_DB_V6';
 function openDB(){
   return new Promise((resolve,reject)=>{
     if(dbInstance){resolve(dbInstance);return;}
@@ -165,7 +168,7 @@ async function loadFromStorage(){
     fileParsed=f.map(x=>({...x,date:new Date(x.date)}));
     if(n) playerNotes=n;
     if(c) config={...config,...c};
-    for(const id in allData){allData[id].history=allData[id].history.map(h=>({...h,date:new Date(h.date)}));}
+    for(const id in allData){allData[id].history=allData[id].history.map(h=>({...h,date:new Date(h.date),dateKey:h.dateKey||new Date(h.date).toISOString().slice(0,10),tropasDisponibles:h.tropasDisponibles!==false,meritosEnemigos:num(h.meritosEnemigos),infanteria:num(h.infanteria),caballeria:num(h.caballeria),arqueros:num(h.arqueros),magos:num(h.magos),otros:num(h.otros),construccion:num(h.construccion),destruccion:num(h.destruccion)}));}
     if(Object.keys(allData).length>0){
       analyze(true);
       const size=new Blob([JSON.stringify(allData)]).size;
@@ -234,37 +237,86 @@ async function handleFiles(files){
     toast(count+' registros guardados','success');
   }
 }
-function parseExcel(buf,name){try{const wb=XLSX.read(buf,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws);if(!rows.length)return 0;const d=new Date(Date.now()+fileParsed.length*1000);fileParsed.push({name,date:d});let c=0;for(const r of rows){const id=String(r['ID de personaje']||r['ID']||'').trim();if(!id)continue;if(!allData[id])allData[id]={id,name:'?',history:[]};allData[id].name=r['Nombre de personaje']||r['Nombre']||allData[id].name||'?';allData[id].history.push({date:d,poder:Number(r['Poder actual']||r['Poder']||0)||0,muertes:Number(r['Muertes (T4/T5)']||r['Muertes']||0)||0,meritos:Number(r['Total de méritos']||r['Meritos']||0)||0,fileName:name});c++;}return c;}catch(e){return 0;}}
+function getDateFromFileName(name){
+  const m=String(name).match(/(20\d{2})-(\d{2})-(\d{2})/);
+  if(!m)return null;
+  const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));
+  return isNaN(d.getTime())?null:d;
+}
+function num(v){const n=Number(v);return Number.isFinite(n)?n:0;}
+function metric(r, names){for(const k of names){if(Object.prototype.hasOwnProperty.call(r,k))return num(r[k]);}return 0;}
+function deathsFromRow(r){
+  if(Object.prototype.hasOwnProperty.call(r,'Muertes (T4/T5)'))return num(r['Muertes (T4/T5)']);
+  return metric(r,['T4 muertas'])+metric(r,['T5 muertas']);
+}
+function parseExcel(buf,name){
+  try{
+    const wb=XLSX.read(buf,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{defval:0});if(!rows.length)return 0;
+    const d=getDateFromFileName(name)||new Date();
+    const dateKey=d.toISOString().slice(0,10);
+    const tieneDesgloseTropas=['Solo infantería','Solo caballería','Solo tiradores','Solo mágicas','Otros méritos'].some(k=>Object.prototype.hasOwnProperty.call(rows[0],k));
+    const oldIdx=fileParsed.findIndex(f=>f.dateKey===dateKey);
+    if(oldIdx>=0){
+      const oldName=fileParsed[oldIdx].name;
+      for(const id in allData)allData[id].history=allData[id].history.filter(h=>h.dateKey!==dateKey && h.fileName!==oldName);
+      fileParsed.splice(oldIdx,1);
+    }
+    fileParsed.push({name,date:d,dateKey});
+    let c=0;
+    for(const r of rows){
+      const id=String(r['ID de personaje']||r['ID']||'').trim();if(!id)continue;
+      if(!allData[id])allData[id]={id,name:'?',history:[]};
+      allData[id].name=r['Nombre de personaje']||r['Nombre']||allData[id].name||'?';
+      const h={
+        date:d,dateKey,poder:metric(r,['Poder actual','Poder']),
+        muertes:deathsFromRow(r),meritos:metric(r,['Total de méritos','Meritos']),
+        meritosEnemigos:metric(r,['Méritos enemigos']),
+        infanteria:metric(r,['Solo infantería']),caballeria:metric(r,['Solo caballería']),
+        arqueros:metric(r,['Solo tiradores']),magos:metric(r,['Solo mágicas']),otros:metric(r,['Otros méritos']),tropasDisponibles:tieneDesgloseTropas,
+        construccion:metric(r,['Tiempo de construcción']),destruccion:metric(r,['Tiempo de destrucción']),fileName:name
+      };
+      const same=allData[id].history.findIndex(x=>x.dateKey===dateKey);
+      if(same>=0)allData[id].history[same]=h;else allData[id].history.push(h);
+      c++;
+    }
+    return c;
+  }catch(e){console.error(e);return 0;}
+}
 // FIX SE FUERON - AHORA REVISA SI ESTA EN EL ULTIMO ARCHIVO
 function analyze(isLoad=false){
   if(!Object.keys(allData).length)return;
   fileParsed.sort((a,b)=>a.date-b.date);
-  const latestFileName = fileParsed[fileParsed.length-1]?.name;
-  computed=[];let tP=0,tM=0,tD=0;
+  const latestDateKey=fileParsed[fileParsed.length-1]?.dateKey;
+  computed=[];let tP=0,tM=0,tD=0,tC=0,tX=0;
   for(const id in allData){
-    const h=allData[id].history.sort((a,b)=>a.date-b.date);
+    const h=allData[id].history.filter(x=>x&&x.date).sort((a,b)=>a.date-b.date);
+    if(!h.length)continue;
     const last=h[h.length-1];
     if(last.poder<config.poderMin)continue;
-    let dM=h.length>1?last.meritos-h[0].meritos:last.meritos;if(dM<0)dM=last.meritos;
-    let dD=h.length>1?last.muertes-h[0].muertes:last.muertes;if(dD<0)dD=last.muertes;
-    const estabaEnUltimo = h.some(x=>x.fileName===latestFileName);
+    const sum=k=>h.reduce((a,x)=>a+num(x[k]),0);
+    const dM=sum('meritos'),dD=sum('muertes'),dC=sum('construccion'),dX=sum('destruccion');
+    const inf=sum('infanteria'),cab=sum('caballeria'),arc=sum('arqueros'),mag=sum('magos'),otr=sum('otros');
+    const estabaEnUltimo=h.some(x=>x.dateKey===latestDateKey);
     const seFue=!estabaEnUltimo;
-    let st='PELEA';
-    if(seFue)st='SE FUE';
-    else if(h.length===1&&!isLoad)st='NUEVO';
-    else if(dM<config.umbralNoAporta)st='NO APORTA';
-    tP+=last.poder;tM+=dM;tD+=dD;
-    computed.push({id,name:allData[id].name,poder:last.poder,meritos:dM,muertes:dD,status:st,rango:0,history:h,seFue});
+    let st='PELEA';if(seFue)st='SE FUE';else if(h.length===1&&!isLoad)st='NUEVO';else if(dM<config.umbralNoAporta)st='NO APORTA';
+    tP+=last.poder;tM+=dM;tD+=dD;tC+=dC;tX+=dX;
+    computed.push({id,name:allData[id].name,poder:last.poder,meritos:dM,muertes:dD,construccion:dC,destruccion:dX,infanteria:inf,caballeria:cab,arqueros:arc,magos:mag,otros:otr,status:st,rango:0,history:h,seFue});
   }
   computed.sort((a,b)=>b.meritos-a.meritos);computed.forEach((c,i)=>c.rango=i+1);
   document.getElementById('sJ').textContent=computed.filter(c=>c.status!=='SE FUE').length;
   document.getElementById('sP').textContent=fmt(tP);document.getElementById('sD').textContent=fmt(tD);
   document.getElementById('sMP').textContent=computed.length?fmt(tM/computed.length):'0';document.getElementById('sMT').textContent=fmt(tM);
+  document.getElementById('sC').textContent=fmtTime(tC);document.getElementById('sX').textContent=fmtTime(tX);
   document.getElementById('cAll').textContent=computed.length;
   document.getElementById('cNA').textContent=computed.filter(c=>c.status==='NO APORTA').length;
   document.getElementById('cSF').textContent=computed.filter(c=>c.status==='SE FUE').length;
   currentPage=1;renderTable();fillCompareSelects();
 }
+function fmtTime(sec){
+  sec=Math.max(0,Math.round(num(sec)));const d=Math.floor(sec/86400);sec%=86400;const h=Math.floor(sec/3600);sec%=3600;const m=Math.floor(sec/60);const s=sec%60;
+  if(d)return `${d}d ${String(h).padStart(2,'0')}h`;if(h)return `${h}h ${String(m).padStart(2,'0')}m`;if(m)return `${m}m ${String(s).padStart(2,'0')}s`;return `${s}s`;
+}
+function dayLabel(d){return new Date(d).toLocaleDateString('es-MX',{day:'2-digit',month:'short'}).replace('.','').toUpperCase();}
 function switchTab(tab){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
   document.getElementById('view-jugadores').classList.add('hidden');document.getElementById('view-graficos').classList.add('hidden');
@@ -301,27 +353,52 @@ function renderTable(){
 function goP(p){const rows=getFiltered();const tp=Math.max(1,Math.ceil(rows.length/PER_PAGE));if(p<1||p>tp)return;currentPage=p;renderTable();}
 function copyInactivos(){if(session.level<2){toast('Solo R4 y R5','error');return;}const inactivos=computed.filter(c=>c.status==='NO APORTA');let txt=`🚨 NO APORTAN - ${inactivos.length}:\n`;inactivos.forEach((p,i)=>{txt+=`${i+1}. ${p.name} [${p.id}] - ${fmt(p.poder)}\n`;});navigator.clipboard.writeText(txt).then(()=>toast('Copiado'));}
 function exportFullReport(){if(session.level<2){toast('Solo R4 y R5','error');return;}const data=computed.map(c=>({'#':c.rango,'Nombre':c.name,'ID':c.id,'Poder':c.poder,'Méritos':c.meritos,'Muertes':c.muertes,'%':(c.meritos/c.poder*100).toFixed(2)+'%','Estado':c.status,'Nota':playerNotes[c.id]||''}));const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Reporte');XLSX.writeFile(wb,`REINO127_Reporte_${new Date().toISOString().slice(0,10)}.xlsx`);}
-function renderCharts(){if(!computed.length)return;Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};const t10m=computed.slice(0,10);charts.meritos=new Chart(document.getElementById('chMeritos'),{type:'bar',data:{labels:t10m.map(r=>r.name),datasets:[{data:t10m.map(r=>r.meritos),backgroundColor:'#f5c518',borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});const t15d=[...computed].sort((a,b)=>b.muertes-a.muertes).slice(0,15);charts.muertes=new Chart(document.getElementById('chMuertes'),{type:'bar',data:{labels:t15d.map(r=>r.name),datasets:[{data:t15d.map(r=>r.muertes),backgroundColor:'#ff5a5a',borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});const est={PELEA:0,'NO APORTA':0,NUEVO:0,'SE FUE':0};computed.forEach(c=>est[c.status]++);charts.estados=new Chart(document.getElementById('chEstados'),{type:'doughnut',data:{labels:Object.keys(est),datasets:[{data:Object.values(est),backgroundColor:['#00ff88','#ff5a5a','#ffcc00','#aaa']}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%'}});const t10p=[...computed].sort((a,b)=>b.poder-a.poder).slice(0,10);charts.poder=new Chart(document.getElementById('chPoder'),{type:'bar',data:{labels:t10p.map(r=>r.name),datasets:[{data:t10p.map(r=>r.poder),backgroundColor:'#64b4ff',borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});}
+function renderCharts(){
+  if(!computed.length)return;Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
+  const makeBar=(id,rows,key,limit)=>{const rs=[...rows].sort((a,b)=>b[key]-a[key]).slice(0,limit);return new Chart(document.getElementById(id),{type:'bar',data:{labels:rs.map(r=>r.name),datasets:[{data:rs.map(r=>r[key]),borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}})};
+  charts.meritos=makeBar('chMeritos',computed,'meritos',10);charts.muertes=makeBar('chMuertes',computed,'muertes',15);
+  const est={PELEA:0,'NO APORTA':0,NUEVO:0,'SE FUE':0};computed.forEach(c=>est[c.status]++);
+  charts.estados=new Chart(document.getElementById('chEstados'),{type:'doughnut',data:{labels:Object.keys(est),datasets:[{data:Object.values(est)}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%'}});
+  charts.poder=makeBar('chPoder',computed,'poder',10);charts.construccion=makeBar('chConstruccion',computed,'construccion',10);charts.destruccion=makeBar('chDestruccion',computed,'destruccion',10);
+}
 function openModal(id){
   currentModalId=id;const p=computed.find(c=>c.id===id);if(!p)return;
   document.getElementById('mName').textContent=p.name;document.getElementById('mId').textContent='ID: '+p.id;document.getElementById('mExportName').textContent=p.name.toUpperCase();
   const se=document.getElementById('mStatus');se.textContent=p.seFue?'🚪 SE FUE':'✅ EN REINO 127';se.style.background=p.seFue?'rgba(255,90,90,.15)':'rgba(0,255,136,.15)';se.style.color=p.seFue?'#ff5a5a':'#00ff88';
   const histSorted=[...p.history].sort((a,b)=>a.date-b.date);
-  let labels=[], dMArr=[], dMuArr=[], acumMArr=[];let acumM=0,acumD=0, porKvK=0,porDias=0;
-  histSorted.forEach((h,i)=>{let dM=i===0?h.meritos:h.meritos-histSorted[i-1].meritos;let dMu=i===0?h.muertes:h.muertes-histSorted[i-1].muertes;if(dM<0)dM=0;if(dMu<0)dMu=0;labels.push(h.fileName.replace('.xlsx','').slice(0,15));dMArr.push(dM);dMuArr.push(dMu);acumM+=dM;acumD+=dMu;acumMArr.push(acumM);if(h.fileName.toLowerCase().includes('kvk')||h.fileName.toLowerCase().includes('semana'))porKvK+=dM;else porDias+=dM;});
-  let pct=p.poder>0?(acumM/p.poder*100):0, cumple=pct>=config.pctMinimo;
-  document.getElementById('mStats').innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Poder</div><div style="font-weight:900">${fmt(p.poder)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Méritos Totales</div><div style="font-weight:900;color:var(--accent)">${fmt(acumM)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Muertes Totales</div><div style="font-weight:900;color:var(--red)">${fmt(acumD)}</div></div><div style="background:${cumple?'rgba(0,255,136,.12)':'rgba(255,90,90,.12)'};border:1px solid ${cumple?'#00ff88':'#ff5a5a'};border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">% Poder</div><div style="font-weight:900;color:${cumple?'#00ff88':'#ff5a5a'}">${pct.toFixed(2)}%</div><div style="font-size:7px">${cumple?'✅ CUMPLE':'❌ Falta '+(config.pctMinimo-pct).toFixed(1)+'%'}</div></div>`;
-  document.getElementById('mTotalMeritos').textContent=fmt(acumM);document.getElementById('mTotalMeritosBreak').textContent=`KvK:${fmt(porKvK)} Días:${fmt(porDias)} ${pct.toFixed(2)}%`;document.getElementById('mTotalMuertes').textContent=fmt(acumD);
+  const labels=histSorted.map(h=>dayLabel(h.date));
+  const dMArr=histSorted.map(h=>num(h.meritos)),dMuArr=histSorted.map(h=>num(h.muertes)),dCArr=histSorted.map(h=>num(h.construccion)),dXArr=histSorted.map(h=>num(h.destruccion));
+  const acumM=dMArr.reduce((a,b)=>a+b,0),acumD=dMuArr.reduce((a,b)=>a+b,0),acumC=dCArr.reduce((a,b)=>a+b,0),acumX=dXArr.reduce((a,b)=>a+b,0);
+  const pct=p.poder>0?(acumM/p.poder*100):0,cumple=pct>=config.pctMinimo;
+  const troopTotal=p.infanteria+p.caballeria+p.arqueros+p.magos+p.otros;
+  document.getElementById('mStats').innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Poder</div><div style="font-weight:900">${fmt(p.poder)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Méritos</div><div style="font-weight:900;color:var(--accent)">${fmt(acumM)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Muertes</div><div style="font-weight:900;color:var(--red)">${fmt(acumD)}</div></div><div style="background:${cumple?'rgba(0,255,136,.12)':'rgba(255,90,90,.12)'};border:1px solid ${cumple?'#00ff88':'#ff5a5a'};border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">% Poder</div><div style="font-weight:900;color:${cumple?'#00ff88':'#ff5a5a'}">${pct.toFixed(2)}%</div></div>`;
+  document.getElementById('mTotalMeritos').textContent=fmt(acumM);document.getElementById('mTotalMeritosBreak').textContent=`${histSorted.length} días • ${pct.toFixed(2)}% del poder`;
+  document.getElementById('mTotalMuertes').textContent=fmt(acumD);document.getElementById('mTotalConstruccion').textContent=fmtTime(acumC);document.getElementById('mTotalDestruccion').textContent=fmtTime(acumX);
   document.getElementById('noteArea').value=playerNotes[id]||'';
-  let hhtml='';for(let i=histSorted.length-1;i>=0;i--){const h=histSorted[i];let dM=i===0?h.meritos:h.meritos-histSorted[i-1].meritos;let dMu=i===0?h.muertes:h.muertes-histSorted[i-1].muertes;if(dM<0)dM=0;if(dMu<0)dMu=0;hhtml+=`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(30,35,64,.5)"><div><div style="font-weight:700;font-size:11px">${esc(h.fileName)}</div><div style="font-size:9px;color:var(--muted)">${h.date.toLocaleDateString()}</div></div><div style="text-align:right"><div style="color:var(--accent);font-weight:700">+${fmt(dM)}</div><div style="color:var(--red);font-size:10px">+${fmt(dMu)}</div></div></div>`;}document.getElementById('mHist').innerHTML=hhtml;
+  let hhtml='';for(let i=histSorted.length-1;i>=0;i--){const h=histSorted[i];hhtml+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(30,35,64,.5)"><div><div style="font-weight:700;font-size:11px">${dayLabel(h.date)}</div><div style="font-size:9px;color:var(--muted)">${esc(h.fileName)}</div></div><div style="text-align:right"><div style="color:var(--accent);font-weight:700">+${fmt(h.meritos)} méritos</div><div style="color:var(--red);font-size:10px">+${fmt(h.muertes)} muertes</div><div style="color:var(--blue);font-size:9px">🏗️ ${fmtTime(h.construccion)} · ⚔️ ${fmtTime(h.destruccion)}</div></div></div>`;}document.getElementById('mHist').innerHTML=hhtml;
+  const troopData=[p.infanteria,p.caballeria,p.arqueros,p.magos,p.otros],troopLabels=['Infantería','Caballería','Arqueros','Magos','Otros'];
+  const troopDays=histSorted.filter(h=>h.tropasDisponibles!==false).length;
+  const troopCoverage=histSorted.length?Math.round(troopDays/histSorted.length*100):0;
+  const troopNote=troopDays<histSorted.length?`<div style=\"font-size:9px;color:var(--yellow);margin:6px 0 0\">⚠️ Desglose de tropas disponible en ${troopDays}/${histSorted.length} días (${troopCoverage}%). Los días sin columnas de tropas no se cuentan como cero.</div>`:'';
+  const oldTroopNote=document.getElementById('troopCoverageNote');if(oldTroopNote)oldTroopNote.remove();document.getElementById('troopBreakdown').insertAdjacentHTML('beforebegin',troopNote.replace('<div ','<div id=\"troopCoverageNote\" '));
+  document.getElementById('troopBreakdown').innerHTML=troopLabels.map((n,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px;font-size:9px;display:flex;justify-content:space-between"><span>${n}</span><b style="color:var(--accent)">${fmt(troopData[i])}</b></div>`).join('');
   Object.values(modalCharts).forEach(c=>{try{c.destroy();}catch(e){}});modalCharts={};
-  setTimeout(()=>{modalCharts.meritos=new Chart(document.getElementById('mChartMeritos'),{type:'line',data:{labels:labels,datasets:[{label:'Día',data:dMArr,borderColor:'#f5c518',backgroundColor:'rgba(245,197,24,.2)',fill:true},{label:'Acumulado',data:acumMArr,borderColor:'#f5c518',borderDash:[5,5],fill:false,pointRadius:0}]},options:{responsive:true}});modalCharts.muertes=new Chart(document.getElementById('mChartMuertes'),{type:'bar',data:{labels:labels,datasets:[{data:dMuArr,backgroundColor:'#ff5a5a'}]},options:{responsive:true,plugins:{legend:{display:false}}}});},100);
+  setTimeout(()=>{
+    modalCharts.meritos=new Chart(document.getElementById('mChartMeritos'),{type:'line',data:{labels,datasets:[{label:'Méritos',data:dMArr,fill:true,tension:.25}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+    modalCharts.muertes=new Chart(document.getElementById('mChartMuertes'),{type:'bar',data:{labels,datasets:[{label:'Muertes',data:dMuArr}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+    modalCharts.tiempo=new Chart(document.getElementById('mChartTiempo'),{type:'bar',data:{labels,datasets:[{label:'Construcción',data:dCArr},{label:'Destrucción',data:dXArr}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
+    modalCharts.tropas=new Chart(document.getElementById('mChartTropas'),{type:'doughnut',data:{labels:troopLabels,datasets:[{data:troopData}]},options:{responsive:true,cutout:'55%'}});
+  },100);
   document.getElementById('modalOverlay').classList.add('active');
 }
 async function saveNote(){if(!currentModalId)return;if(session.level<2){toast('Solo R4+','error');return;}const text=document.getElementById('noteArea').value.trim();if(text)playerNotes[currentModalId]=text;else delete playerNotes[currentModalId];await saveToStorage();renderTable();toast('Nota guardada','success');}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('active');}
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target.id==='modalOverlay')closeModal();});
-function exportarJugadorExcel(){if(session.role==='miembro'){toast('Solo R4 y R5','error');return;}if(!currentModalId)return;const p=computed.find(c=>c.id===currentModalId);const hist=[...p.history].sort((a,b)=>a.date-b.date);let acumM=0,acumD=0;const data=[];hist.forEach((h,i)=>{let dM=i===0?h.meritos:h.meritos-hist[i-1].meritos;let dMu=i===0?h.muertes:h.muertes-hist[i-1].muertes;if(dM<0)dM=0;if(dMu<0)dMu=0;acumM+=dM;acumD+=dMu;data.push({"ID":p.id,"Nombre":p.name,"Archivo":h.fileName,"Méritos +":dM,"Muertes +":dMu,"Acum Méritos":acumM,"Acum Muertes":acumD,"Poder":h.poder,"%":(acumM/h.poder*100).toFixed(2)+"%"});});const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Historial");XLSX.writeFile(wb,`REINO127_${p.name}_${p.id}.xlsx`);}
+function exportarJugadorExcel(){
+  if(session.role==='miembro'){toast('Solo R4 y R5','error');return;}if(!currentModalId)return;const p=computed.find(c=>c.id===currentModalId);const hist=[...p.history].sort((a,b)=>a.date-b.date);let acumM=0,acumD=0,acumC=0,acumX=0;const data=[];
+  hist.forEach(h=>{acumM+=num(h.meritos);acumD+=num(h.muertes);acumC+=num(h.construccion);acumX+=num(h.destruccion);data.push({'Fecha':h.dateKey,'Nombre':p.name,'ID':p.id,'Poder':h.poder,'Méritos del día':h.meritos,'Muertes del día':h.muertes,'Construcción (s)':h.construccion,'Destrucción (s)':h.destruccion,'Infantería':h.infanteria,'Caballería':h.caballeria,'Arqueros':h.arqueros,'Magos':h.magos,'Otros méritos':h.otros,'Méritos acumulados':acumM,'Muertes acumuladas':acumD,'Construcción acumulada (s)':acumC,'Destrucción acumulada (s)':acumX});});
+  const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Historial');XLSX.writeFile(wb,`REINO127_${p.name}_${p.id}.xlsx`);
+}
 function fillCompareSelects(){const s1=document.getElementById('compare1'), s2=document.getElementById('compare2');if(!s1)return;s1.innerHTML='';s2.innerHTML='';computed.forEach(p=>{s1.innerHTML+=`<option value="${p.id}">${p.name} [${p.id.slice(-6)}]</option>`;s2.innerHTML+=`<option value="${p.id}">${p.name} [${p.id.slice(-6)}]</option>`;});if(computed[1])s2.selectedIndex=1;}
 function openCompare(){fillCompareSelects();document.getElementById('compareOverlay').classList.add('active');}
 function closeCompare(){document.getElementById('compareOverlay').classList.remove('active');}
