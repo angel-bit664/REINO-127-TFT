@@ -6,6 +6,49 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+// ============================================================
+// SUPABASE - DATOS COMPARTIDOS DEL REINO
+// IMPORTANTE: usa SOLO la Publishable/anon key. NUNCA service_role.
+// ============================================================
+const SUPABASE_URL = 'https://pbivjbzqvtehnagpbhb.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_HWF7sUnsOqNyLeOa4368ag_LVEBJxHU';
+
+function supabaseReady(){
+  return SUPABASE_URL && SUPABASE_ANON_KEY &&
+    !SUPABASE_ANON_KEY.includes('PEGA_AQUI');
+}
+async function sbFetch(path, options={}){
+  if(!supabaseReady()) throw new Error('Falta configurar la Publishable/anon key de Supabase.');
+  const headers={
+    'apikey':SUPABASE_ANON_KEY,
+    'Authorization':'Bearer '+SUPABASE_ANON_KEY,
+    'Content-Type':'application/json',
+    ...(options.headers||{})
+  };
+  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{...options,headers});
+  const txt=await r.text();
+  if(!r.ok) throw new Error(txt||('Supabase HTTP '+r.status));
+  return txt?JSON.parse(txt):null;
+}
+async function sbGetAll(table, select='*', orderColumn='fecha'){
+  const out=[]; let from=0; const page=1000;
+  while(true){
+    const rows=await sbFetch(`${table}?select=${encodeURIComponent(select)}&order=${encodeURIComponent(orderColumn)}.asc.nullslast`,{
+      headers:{'Range':`${from}-${from+page-1}`,'Prefer':'count=none'}
+    });
+    if(!Array.isArray(rows)||!rows.length)break;
+    out.push(...rows);
+    if(rows.length<page)break;
+    from+=page;
+  }
+  return out;
+}
+function setRemoteStatus(msg,type='info'){
+  const el=document.getElementById('memInfo');
+  if(el) el.textContent=msg;
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -69,7 +112,7 @@
     <div style="display:flex;gap:10px;align-items:center"><div style="width:42px;height:42px;border-radius:10px;background:var(--card);border:1px solid var(--border);display:grid;place-items:center">⚔️</div><div><div style="font-weight:900;color:var(--accent)">REINO 127</div><div style="font-size:9px;color:var(--muted)">TFT</div></div></div>
     <div style="display:flex;align-items:center;gap:8px"><span id="roleBadge" style="font-size:10px;font-weight:700;padding:5px 10px;border-radius:20px;background:var(--card);border:1px solid var(--border)"></span><button onclick="doLogout()" style="width:32px;height:32px;background:var(--card);border:1px solid var(--border);border-radius:50%;color:var(--muted);cursor:pointer"><i class="fas fa-right-from-bracket"></i></button></div>
   </header>
-  <div class="upload-zone" id="uploadZone"><div style="color:var(--accent);font-weight:700"><i class="fas fa-cloud-arrow-up"></i> Arrastra tu ZIP aquí o click</div><div id="fileInfo" style="margin-top:6px;color:var(--accent);font-size:10px;font-weight:700"></div><div id="memInfo" style="font-size:9px;color:var(--green);margin-top:4px"></div></div>
+  <div class="upload-zone" id="uploadZone"><div style="color:var(--accent);font-weight:700"><i class="fas fa-cloud-arrow-up"></i> Arrastra tu ZIP aquí o click</div><div style="font-size:9px;color:var(--muted);margin-top:4px">R4/R5: los datos se guardan en Supabase para todo el reino</div><div id="fileInfo" style="margin-top:6px;color:var(--accent);font-size:10px;font-weight:700"></div><button id="syncBtn" class="btn-sm btn-export" style="margin:8px auto 0;display:inline-flex" onclick="syncCurrentData(event)"><i class="fas fa-cloud-arrow-up"></i> SINCRONIZAR CON SUPABASE</button><div id="memInfo" style="font-size:9px;color:var(--green);margin-top:4px"></div></div>
   <div id="viewOnlyMsg" class="hidden" style="margin:14px 16px;padding:10px;background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.2);border-radius:10px;font-size:11px;color:#64b4ff;text-align:center"><i class="fas fa-eye"></i> Modo Miembro: Solo lectura</div>
   <input type="file" id="fileInput" accept=".zip,.xlsx,.xls" multiple hidden>
   <div class="files-panel oficial-only" id="filesPanel"><div class="files-header" onclick="toggleFilesPanel()"><div style="display:flex;align-items:center;gap:8px"><i class="fas fa-folder-open" style="color:var(--accent)"></i><span style="font-size:11px;font-weight:700">Archivos cargados</span><span id="fileCount" style="font-size:9px;color:var(--muted)">0</span></div><i class="fas fa-chevron-down" id="filesChevron" style="font-size:10px;color:var(--muted)"></i></div><div class="files-list" id="filesList"></div></div>
@@ -158,24 +201,89 @@ async function saveToStorage(){
   }catch(e){toast('Error guardando: '+e.message,'error');}
 }
 async function loadFromStorage(){
+  // 1) Supabase = fuente compartida para todos los dispositivos.
+  if(supabaseReady()){
+    try{
+      const [players, stats]=await Promise.all([
+        sbGetAll('jugadores','*','id'),
+        sbGetAll('estadisticas_diarias','*','fecha')
+      ]);
+      if(Array.isArray(stats) && stats.length){
+        allData={}; fileParsed=[];
+        const pmap={};
+        for(const p of (players||[])){
+          pmap[String(p.id)]={playerId:String(p.player_id??p.id??''),name:String(p.nombre??'?'),rango:num(p.rango),reino:num(p.reino)};
+        }
+        const dates=new Map();
+        for(const r of stats){
+          const jid=String(r.jugador_id??'');
+          const jp=pmap[jid]||{};
+          const pid=String(r.player_id??jp.playerId??r.id??'').trim();
+          if(!pid)continue;
+          const dateKey=String(r.fecha||'').slice(0,10);
+          if(!dateKey)continue;
+          const d=new Date(dateKey+'T00:00:00');
+          if(!allData[pid])allData[pid]={id:pid,name:jp.name||String(r.nombre??'?'),history:[]};
+          allData[pid].name=jp.name||String(r.nombre??allData[pid].name||'?');
+          allData[pid].history.push({
+            date:d,dateKey,
+            poder:num(r.poder),poder_maximo:num(r.poder_maximo),
+            muertes:num(r.t4_muertas)+num(r.t5_muertas),t4_muertas:num(r.t4_muertas),t5_muertas:num(r.t5_muertas),
+            t4_heridas:num(r.t4_heridas),t5_heridas:num(r.t5_heridas),
+            meritos:num(r.meritos_total),
+            meritosEnemigos:num(r.meritos_enemigos),
+            infanteria:num(r.meritos_infanteria),caballeria:num(r.meritos_caballeria),
+            arqueros:num(r.meritos_arqueros),magos:num(r.meritos_magos),otros:num(r.meritos_otros),
+            construccion:num(r.tiempo_construccion),destruccion:num(r.tiempo_destruccion),
+            recoleccion:num(r.recoleccion),t4_curadas:num(r.t4_curadas),t5_curadas:num(r.t5_curadas),ayuda_alianza:num(r.ayuda_alianza),tropasDisponibles:true,fileName:'Supabase • '+dateKey
+          });
+          dates.set(dateKey,true);
+        }
+        fileParsed=[...dates.keys()].sort().map(k=>({name:'Supabase • '+k,date:new Date(k+'T00:00:00'),dateKey:k}));
+        // Convertir acumulados de Supabase en valores diarios para que el análisis no duplique méritos.
+        for(const id in allData){
+          const h=allData[id].history.sort((a,b)=>a.date-b.date);
+          for(let i=h.length-1;i>0;i--){
+            const prev=h[i-1],cur=h[i];
+            for(const k of ['meritos','muertes','meritosEnemigos','infanteria','caballeria','arqueros','magos','otros','construccion','destruccion']){
+              const diff=num(cur[k])-num(prev[k]); cur[k]=diff<0?num(cur[k]):diff;
+            }
+          }
+        }
+        await idbSet('allData',allData);
+        await idbSet('fileParsed',fileParsed);
+        analyze(true);
+        setRemoteStatus(`☁️ Supabase conectado • ${Object.keys(allData).length} jugadores • ${fileParsed.length} días`,'success');
+        return true;
+      }
+    }catch(e){
+      console.warn('Supabase no disponible:',e);
+      setRemoteStatus('⚠️ Supabase no disponible • usando memoria local','error');
+    }
+  }else{
+    setRemoteStatus('⚠️ Falta la Publishable/anon key de Supabase');
+  }
+
+  // 2) Fallback local.
   try{
     const d=await idbGet('allData');
     const f=await idbGet('fileParsed');
     const n=await idbGet('playerNotes');
     const c=await idbGet('config');
-    if(!d||!f) return false;
+    if(!d||!f)return false;
     allData=d;
     fileParsed=f.map(x=>({...x,date:new Date(x.date)}));
-    if(n) playerNotes=n;
-    if(c) config={...config,...c};
-    for(const id in allData){allData[id].history=allData[id].history.map(h=>({...h,date:new Date(h.date),dateKey:h.dateKey||new Date(h.date).toISOString().slice(0,10),tropasDisponibles:h.tropasDisponibles!==false,meritosEnemigos:num(h.meritosEnemigos),infanteria:num(h.infanteria),caballeria:num(h.caballeria),arqueros:num(h.arqueros),magos:num(h.magos),otros:num(h.otros),construccion:num(h.construccion),destruccion:num(h.destruccion)}));}
+    if(n)playerNotes=n;
+    if(c)config={...config,...c};
+    for(const id in allData){
+      allData[id].history=allData[id].history.map(h=>({...h,date:new Date(h.date),dateKey:h.dateKey||new Date(h.date).toISOString().slice(0,10),
+        tropasDisponibles:h.tropasDisponibles!==false,t4_muertas:num(h.t4_muertas),t5_muertas:num(h.t5_muertas),t4_heridas:num(h.t4_heridas),t5_heridas:num(h.t5_heridas),recoleccion:num(h.recoleccion),t4_curadas:num(h.t4_curadas),t5_curadas:num(h.t5_curadas),ayuda_alianza:num(h.ayuda_alianza),meritosEnemigos:num(h.meritosEnemigos),infanteria:num(h.infanteria),caballeria:num(h.caballeria),arqueros:num(h.arqueros),magos:num(h.magos),otros:num(h.otros),construccion:num(h.construccion),destruccion:num(h.destruccion)}));
+    }
     if(Object.keys(allData).length>0){
       analyze(true);
-      const size=new Blob([JSON.stringify(allData)]).size;
-      document.getElementById('memInfo').textContent=`📦 IndexedDB: ${fileParsed.length} archivos - ${(size/1024/1024).toFixed(2)}MB`;
       return true;
     }
-  }catch(e){}
+  }catch(e){console.warn('Fallback local:',e);}
   return false;
 }
 async function clearMemory(){
@@ -225,16 +333,109 @@ async function handleFiles(files){
   let count=0;
   for(const f of files){
     try{
-      if(f.name.endsWith('.zip')){const zip=await JSZip.loadAsync(f);for(const n in zip.files){if(n.endsWith('.xlsx')||n.endsWith('.xls'))count+=parseExcel(await zip.files[n].async('arraybuffer'),n);}}
-      else{count+=parseExcel(await f.arrayBuffer(),f.name);}
-    }catch(e){}
+      if(f.name.toLowerCase().endsWith('.zip')){
+        const zip=await JSZip.loadAsync(f);
+        for(const n in zip.files){
+          const entry=zip.files[n], lower=String(n).toLowerCase();
+          if(!entry.dir && (lower.endsWith('.xlsx')||lower.endsWith('.xls')))
+            count+=parseExcel(await entry.async('arraybuffer'),n);
+        }
+      }else{
+        count+=parseExcel(await f.arrayBuffer(),f.name);
+      }
+    }catch(e){console.error(e);toast('Error leyendo '+f.name,'error');}
   }
   document.getElementById('fileInfo').textContent=count+' registros';
   if(Object.keys(allData).length>0){
     analyze(false);
     await saveToStorage();
     renderFilesList();
-    toast(count+' registros guardados','success');
+    toast(count+' registros cargados localmente. Pulsa SINCRONIZAR CON SUPABASE.','success');
+  }
+}
+
+async function syncCurrentData(ev){
+  if(ev)ev.stopPropagation();
+  if(!session || session.level<2){toast('Solo R4 y R5 pueden sincronizar','error');return;}
+  if(!supabaseReady()){toast('Falta la Publishable/anon key de Supabase','error');return;}
+  if(!fileParsed.length || !Object.keys(allData).length){toast('Primero carga el ZIP','error');return;}
+  const btn=document.getElementById('syncBtn'); if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> SUBIENDO...';}
+  try{
+    // A) Upsert de jugadores.
+    const players=[];
+    for(const id in allData){
+      const last=[...allData[id].history].sort((a,b)=>b.date-a.date)[0];
+      players.push({
+        player_id:String(id),
+        nombre:String(allData[id].name||'?'),
+        rango:0,
+        reino:127
+      });
+    }
+    for(let i=0;i<players.length;i+=200){
+      await sbFetch('jugadores?on_conflict=player_id',{
+        method:'POST',
+        headers:{'Prefer':'resolution=merge-duplicates,return=minimal'},
+        body:JSON.stringify(players.slice(i,i+200))
+      });
+    }
+
+    // B) Recuperar IDs internos para la FK jugador_id.
+    const ids=Object.keys(allData);
+    const found=[];
+    for(let i=0;i<ids.length;i+=80){
+      const q=ids.slice(i,i+80).map(x=>encodeURIComponent(x)).join(',');
+      const rows=await sbFetch(`jugadores?select=id,player_id&player_id=in.(${q})`);
+      found.push(...rows);
+    }
+    const idMap={};(found||[]).forEach(r=>idMap[String(r.player_id)]=r.id);
+
+    // C) Guardar cada snapshot en estadisticas_diarias.
+    // Los campos son los que verificamos en Supabase.
+    const rows=[];
+    for(const id in allData){
+      const jid=idMap[String(id)]; if(jid==null)continue;
+      for(const h of allData[id].history){
+        rows.push({
+          jugador_id:jid,
+          fecha:h.dateKey,
+          poder:Math.round(num(h.poder)),
+          poder_maximo:Math.round(num(h.poder_maximo)),
+          t4_muertas:Math.round(num(h.t4_muertas)),
+          t5_muertas:Math.round(num(h.t5_muertas)),
+          t4_heridas:Math.round(num(h.t4_heridas)),
+          t5_heridas:Math.round(num(h.t5_heridas)),
+          meritos_total:Math.round(num(h.meritos)),
+          meritos_enemigos:Math.round(num(h.meritosEnemigos)),
+          meritos_infanteria:Math.round(num(h.infanteria)),
+          meritos_caballeria:Math.round(num(h.caballeria)),
+          meritos_arqueros:Math.round(num(h.arqueros)),
+          meritos_magos:Math.round(num(h.magos)),
+          meritos_otros:Math.round(num(h.otros)),
+          recoleccion:Math.round(num(h.recoleccion)),
+          t4_curadas:Math.round(num(h.t4_curadas)),
+          t5_curadas:Math.round(num(h.t5_curadas)),
+          tiempo_construccion:Math.round(num(h.construccion)),
+          tiempo_destruccion:Math.round(num(h.destruccion)),
+          ayuda_alianza:Math.round(num(h.ayuda_alianza))
+        });
+      }
+    }
+    for(let i=0;i<rows.length;i+=300){
+      await sbFetch('estadisticas_diarias?on_conflict=jugador_id,fecha',{
+        method:'POST',
+        headers:{'Prefer':'resolution=merge-duplicates,return=minimal'},
+        body:JSON.stringify(rows.slice(i,i+300))
+      });
+    }
+    toast(`☁️ ${rows.length} registros sincronizados con Supabase`,'success');
+    setRemoteStatus(`☁️ Supabase actualizado • ${rows.length} registros`,'success');
+  }catch(e){
+    console.error('SYNC SUPABASE',e);
+    toast('Error Supabase: '+e.message,'error');
+    setRemoteStatus('❌ Error sincronizando: '+e.message,'error');
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-cloud-arrow-up"></i> SINCRONIZAR CON SUPABASE';}
   }
 }
 function getDateFromFileName(name){
@@ -268,12 +469,14 @@ function parseExcel(buf,name){
       if(!allData[id])allData[id]={id,name:'?',history:[]};
       allData[id].name=r['Nombre de personaje']||r['Nombre']||allData[id].name||'?';
       const h={
-        date:d,dateKey,poder:metric(r,['Poder actual','Poder']),
-        muertes:deathsFromRow(r),meritos:metric(r,['Total de méritos','Meritos']),
-        meritosEnemigos:metric(r,['Méritos enemigos']),
+        date:d,dateKey,poder:metric(r,['Poder actual','Poder']),poder_maximo:metric(r,['Máximo poder histórico','Poder máximo','Poder maximo']),
+        muertes:deathsFromRow(r),t4_muertas:metric(r,['T4 muertas']),t5_muertas:metric(r,['T5 muertas']),
+        t4_heridas:metric(r,['T4 gravemente heridas','T4 heridas']),t5_heridas:metric(r,['T5 gravemente heridas','T5 heridas']),
+        meritos:metric(r,['Total de méritos','Meritos']),meritosEnemigos:metric(r,['Méritos enemigos']),
         infanteria:metric(r,['Solo infantería']),caballeria:metric(r,['Solo caballería']),
         arqueros:metric(r,['Solo tiradores']),magos:metric(r,['Solo mágicas']),otros:metric(r,['Otros méritos']),tropasDisponibles:tieneDesgloseTropas,
-        construccion:metric(r,['Tiempo de construcción']),destruccion:metric(r,['Tiempo de destrucción']),fileName:name
+        recoleccion:metric(r,['Recolección','Recoleccion']),t4_curadas:metric(r,['T4 curadas']),t5_curadas:metric(r,['T5 curadas']),
+        construccion:metric(r,['Tiempo de construcción']),destruccion:metric(r,['Tiempo de destrucción']),ayuda_alianza:metric(r,['Ayuda de la Alianza','Ayuda alianza']),fileName:name
       };
       const same=allData[id].history.findIndex(x=>x.dateKey===dateKey);
       if(same>=0)allData[id].history[same]=h;else allData[id].history.push(h);
