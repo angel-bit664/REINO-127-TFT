@@ -151,6 +151,10 @@ function setRemoteStatus(msg,type='info'){
 <div id="toastBox" style="position:fixed;top:70px;right:16px;z-index:999999;display:flex;flex-direction:column;gap:6px"></div>
 <script>
 let config={poderMin:20000000,umbralNoAporta:100000,pctMinimo:12,poderGold:150000000,seFueDias:2};
+function safeSessionGet(key){try{return sessionStorage.getItem(key);}catch(e){return null;}}
+function safeSessionSet(key,value){try{sessionStorage.setItem(key,value);}catch(e){}}
+function safeSessionRemove(key){try{sessionStorage.removeItem(key);}catch(e){}}
+
 const PASS_MAP={miembro:'',oficial:'oficiales',lider:'r5'};
 const CREDS={miembro:{level:1,label:'Miembro'},oficial:{level:2,label:'Oficial'},lider:{level:3,label:'Líder'}};
 const PER_PAGE=50;
@@ -224,7 +228,7 @@ async function loadFromStorage(){
           if(!dateKey)continue;
           const d=new Date(dateKey+'T00:00:00');
           if(!allData[pid])allData[pid]={id:pid,name:jp.name||String(r.nombre??'?'),history:[]};
-          allData[pid].name=jp.name||String(r.nombre??allData[pid].name||'?');
+          allData[pid].name=jp.name||String(r.nombre ?? allData[pid].name ?? '?');
           allData[pid].history.push({
             date:d,dateKey,
             poder:num(r.poder),poder_maximo:num(r.poder_maximo),
@@ -302,9 +306,9 @@ async function deleteFile(idx){
   for(const id in allData){allData[id].history=allData[id].history.filter(h=>h.fileName!==f.name);if(allData[id].history.length===0)delete allData[id];}
   fileParsed.splice(idx,1);await saveToStorage();renderFilesList();analyze(true);toast('Eliminado','success');
 }
-function selectRole(r){selectedRole=r;document.querySelectorAll('.role-card').forEach(c=>c.classList.toggle('selected',c.dataset.role===r));if(r==='miembro'){session={role:r,level:1,t:Date.now()};sessionStorage.setItem('r127_session',JSON.stringify(session));enterApp();}else{document.getElementById('pwdSection').classList.add('show');}}
+function selectRole(r){selectedRole=r;document.querySelectorAll('.role-card').forEach(c=>c.classList.toggle('selected',c.dataset.role===r));if(r==='miembro'){session={role:r,level:1,t:Date.now()};safeSessionSet('r127_session',JSON.stringify(session));enterApp();}else{document.getElementById('pwdSection').classList.add('show');}}
 document.getElementById('pwdInput').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-function doLogin(){if(!selectedRole)return;if(selectedRole==='miembro'){session={role:'miembro',level:1,t:Date.now()};sessionStorage.setItem('r127_session',JSON.stringify(session));enterApp();return;}const inp=document.getElementById('pwdInput').value.trim();if(inp===PASS_MAP[selectedRole]){session={role:selectedRole,level:CREDS[selectedRole].level,t:Date.now()};sessionStorage.setItem('r127_session',JSON.stringify(session));enterApp();}else{document.getElementById('loginError').textContent='Incorrecta - R4: oficiales / R5: r5';}}
+function doLogin(){if(!selectedRole)return;if(selectedRole==='miembro'){session={role:'miembro',level:1,t:Date.now()};safeSessionSet('r127_session',JSON.stringify(session));enterApp();return;}const inp=document.getElementById('pwdInput').value.trim();if(inp===PASS_MAP[selectedRole]){session={role:selectedRole,level:CREDS[selectedRole].level,t:Date.now()};safeSessionSet('r127_session',JSON.stringify(session));enterApp();}else{document.getElementById('loginError').textContent='Incorrecta - R4: oficiales / R5: r5';}}
 async function enterApp(){
   document.getElementById('loginScreen').style.display='none';document.getElementById('mainApp').classList.remove('hidden');
   document.getElementById('roleBadge').textContent=CREDS[session.role].label;
@@ -318,8 +322,8 @@ async function enterApp(){
   if(!loaded){document.getElementById('memInfo').textContent=isMiembro?'Solo lectura - sin datos':'Sube tu ZIP (IndexedDB)';}
   renderFilesList();
 }
-function doLogout(){session=null;sessionStorage.removeItem('r127_session');location.reload();}
-(async function(){const s=sessionStorage.getItem('r127_session');if(s){try{const j=JSON.parse(s);if(Date.now()-j.t<86400000){session=j;await enterApp();}}catch(e){}}})();
+function doLogout(){session=null;safeSessionRemove('r127_session');location.reload();}
+(async function(){const s=safeSessionGet('r127_session');if(s){try{const j=JSON.parse(s);if(Date.now()-j.t<86400000){session=j;await enterApp();}}catch(e){}}})();
 const zone=document.getElementById('uploadZone'),fileInput=document.getElementById('fileInput');
 zone.addEventListener('click',()=>{if(session&&session.role!=='miembro')fileInput.click();});
 zone.addEventListener('dragover',e=>{e.preventDefault();if(session&&session.role!=='miembro')zone.classList.add('dragover');});
