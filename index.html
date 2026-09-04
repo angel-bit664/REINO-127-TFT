@@ -49,19 +49,264 @@ function setRemoteStatus(msg,type='info'){
   if(el) el.textContent=msg;
 }
 </script>
+<link rel="preload" as="image" href="./assets/reino127-login.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
 :root{--bg:#0b0e1a;--surface:#121525;--card:#151a30;--border:#1e2340;--muted:#8e93b0;--accent:#f5c518;--accent-d:rgba(245,197,24,.12);--green:#00ff88;--green-d:rgba(0,255,136,.12);--red:#ff5a5a;--red-d:rgba(255,59,59,.12);--yellow:#ffcc00;--yellow-d:rgba(255,204,0,.12);--blue:#64b4ff;--blue-d:rgba(100,180,255,.12)}
 *{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:#fff;font-family:Inter,sans-serif;min-height:100vh}
-#loginScreen{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;background:radial-gradient(ellipse at 30% 40%,rgba(245,197,24,.08) 0%,transparent 50%),var(--bg)}
-.login-card{background:rgba(21,26,48,.95);border:1px solid var(--border);border-radius:24px;padding:30px;width:92%;max-width:420px;text-align:center}
-.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
-.role-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px 6px;cursor:pointer;transition:.2s}
-.role-card.selected{border-color:var(--accent);background:var(--accent-d)}
-#pwdSection{max-height:0;overflow:hidden;opacity:0;transition:.4s}#pwdSection.show{max-height:200px;opacity:1}
-.pwd-input{width:100%;padding:11px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:#fff;text-align:center;margin-bottom:10px;outline:none}
-.login-btn{width:100%;padding:11px;background:linear-gradient(135deg,#f5c518,#ff8c00);border:none;border-radius:10px;color:#000;font-weight:900;cursor:pointer}
+#loginScreen{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  isolation:isolate;
+  background:#030711;
+}
+#loginScreen::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background-image:url("./assets/reino127-login.png");
+  background-position:center center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  transform:scale(1.015);
+}
+#loginScreen::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(1,5,14,.32) 0%,rgba(1,5,14,.08) 42%,rgba(1,5,14,.20) 100%),
+    linear-gradient(0deg,rgba(1,5,14,.30) 0%,transparent 38%,rgba(1,5,14,.12) 100%);
+}
+.login-screen-content{
+  width:100%;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  position:relative;
+  z-index:2;
+}
+.login-card{
+  width:min(470px,92vw);
+  padding:30px 30px 26px;
+  border-radius:22px;
+  text-align:center;
+  background:
+    linear-gradient(145deg,rgba(8,14,29,.92),rgba(4,8,19,.88));
+  border:1px solid rgba(91,129,214,.28);
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.72),
+    0 0 45px rgba(0,91,255,.13),
+    inset 0 1px 0 rgba(255,255,255,.045);
+  backdrop-filter:blur(8px) saturate(120%);
+  -webkit-backdrop-filter:blur(8px) saturate(120%);
+  position:relative;
+}
+.login-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:22px;
+  pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.04),transparent 35%,rgba(0,132,255,.035));
+}
+.login-brand-icon{
+  width:52px;
+  height:52px;
+  margin:0 auto 8px;
+  display:grid;
+  place-items:center;
+  border-radius:15px;
+  font-size:28px;
+  background:linear-gradient(145deg,rgba(41,126,255,.25),rgba(0,20,70,.45));
+  border:1px solid rgba(83,159,255,.4);
+  box-shadow:0 0 25px rgba(0,130,255,.18),inset 0 0 15px rgba(80,160,255,.08);
+}
+.login-title{
+  font-weight:900;
+  font-size:30px;
+  line-height:1;
+  color:#ffc400;
+  letter-spacing:.5px;
+  text-shadow:0 2px 14px rgba(0,0,0,.65);
+}
+.login-subtitle{
+  font-size:10px;
+  color:#aeb8ca;
+  margin:8px 0 20px;
+  letter-spacing:3px;
+}
+.role-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+  margin-bottom:14px;
+}
+.role-card{
+  min-height:82px;
+  background:rgba(7,13,30,.72);
+  border:1px solid rgba(75,101,170,.35);
+  border-radius:13px;
+  padding:12px 6px 10px;
+  cursor:pointer;
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,background .2s ease;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+}
+.role-card i{
+  font-size:17px;
+  margin-bottom:6px;
+  color:#fff;
+}
+.role-card div{
+  color:#fff;
+}
+.role-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,196,0,.65);
+  background:rgba(12,20,43,.86);
+}
+.role-card.selected{
+  border:2px solid #ffc400;
+  background:linear-gradient(145deg,rgba(25,31,55,.92),rgba(9,15,32,.94));
+  box-shadow:0 0 24px rgba(255,196,0,.15),inset 0 0 20px rgba(255,196,0,.035);
+}
+.role-card.selected i{
+  color:#fff;
+}
+#pwdSection{
+  max-height:0;
+  overflow:hidden;
+  opacity:0;
+  transform:translateY(-5px);
+  transition:max-height .35s ease,opacity .25s ease,transform .35s ease;
+}
+#pwdSection.show{
+  max-height:180px;
+  opacity:1;
+  transform:translateY(0);
+}
+.password-wrap{
+  position:relative;
+  margin-bottom:10px;
+}
+.pwd-input{
+  width:100%;
+  height:50px;
+  padding:11px 45px 11px 14px;
+  background:rgba(5,10,24,.88);
+  border:1px solid rgba(75,101,170,.35);
+  border-radius:11px;
+  color:#fff;
+  text-align:center;
+  font-size:13px;
+  letter-spacing:2px;
+  outline:none;
+  transition:.2s ease;
+}
+.pwd-input::placeholder{
+  color:#7d8498;
+  letter-spacing:1px;
+}
+.pwd-input:focus{
+  border-color:#ffc400;
+  box-shadow:0 0 18px rgba(255,196,0,.10);
+}
+.password-toggle{
+  position:absolute;
+  right:8px;
+  top:7px;
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:#8e93b0;
+  cursor:pointer;
+}
+.password-toggle:hover{
+  color:#fff;
+  background:rgba(255,255,255,.05);
+}
+.login-btn{
+  width:100%;
+  height:52px;
+  padding:11px;
+  background:linear-gradient(135deg,#ffc518,#ff8c00);
+  border:none;
+  border-radius:11px;
+  color:#070707;
+  font-weight:900;
+  font-size:14px;
+  cursor:pointer;
+  box-shadow:0 7px 22px rgba(255,145,0,.15);
+  transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+}
+.login-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 28px rgba(255,145,0,.27);
+  filter:saturate(1.08);
+}
+.login-btn:active{
+  transform:translateY(0);
+}
+.login-hint{
+  font-size:9px;
+  color:#6f7890;
+  margin-top:8px;
+}
+#loginError{
+  font-size:11px;
+  color:#ff5a5a;
+  min-height:14px;
+  margin-top:8px;
+}
+@media(max-width:700px){
+  #loginScreen::before{
+    background-position:58% center;
+  }
+  .login-screen-content{
+    padding:16px;
+  }
+  .login-card{
+    width:min(430px,94vw);
+    padding:24px 18px 20px;
+  }
+  .login-title{
+    font-size:26px;
+  }
+}
+@media(max-width:480px){
+  #loginScreen::before{
+    background-position:60% center;
+  }
+  .login-card{
+    padding:21px 14px 18px;
+  }
+  .role-grid{
+    gap:6px;
+  }
+  .role-card{
+    min-height:76px;
+    padding:9px 4px;
+  }
+  .role-card div{
+    font-size:10px!important;
+  }
+}
 .header{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(18,21,37,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
 .upload-zone{border:2px dashed var(--border);border-radius:14px;padding:18px;text-align:center;background:var(--surface);margin:14px 16px;cursor:pointer}
 .stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 16px 12px}.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}.stat-label{font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase}.stat-value{font-size:19px;font-weight:900;margin-top:4px}
@@ -86,24 +331,64 @@ function setRemoteStatus(msg,type='info'){
 .note-area{width:100%;padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px;resize:vertical;min-height:60px;margin:8px 0}
 .config-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
 .config-label{font-size:11px;color:var(--muted)}.config-input{width:120px;padding:7px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px;text-align:right}
+
+.chart-controls{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:0 16px 12px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:12px}.chart-controls>div{display:flex;flex-direction:column;gap:4px;min-width:150px}.chart-controls label{font-size:8px;color:var(--muted);font-weight:800;text-transform:uppercase}.chart-controls input,.chart-controls select{min-width:150px}.period-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 16px 12px}.period-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}.period-card .label{font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase}.period-card .value{font-size:16px;font-weight:900;margin-top:4px}.alliance-chart-card{margin:0 16px 14px}.alliance-chart-wrap{height:520px}.compare-metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.compare-metric{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px;text-align:center}.compare-metric .label{font-size:8px;color:var(--muted)}.compare-metric .values{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px;font-size:11px;font-weight:800}.compare-metric .p1{color:var(--accent)}.compare-metric .p2{color:var(--blue)}
 @media(max-width:800px){.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.detail-total-box{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <div id="loginScreen">
-  <div class="login-card">
-    <div style="font-size:40px;margin-bottom:10px">🛡️</div>
-    <div style="font-weight:900;font-size:24px;color:var(--accent)">REINO 127</div>
-    <div style="font-size:10px;color:var(--muted);margin:6px 0 18px;letter-spacing:2px">TFT • Call of Dragons</div>
-    <div class="role-grid">
-      <div class="role-card" data-role="miembro" onclick="selectRole('miembro')"><i class="fas fa-user"></i><div style="font-size:11px;font-weight:700">Miembro</div><div style="font-size:8px;color:var(--green)">LIBRE</div></div>
-      <div class="role-card" data-role="oficial" onclick="selectRole('oficial')"><i class="fas fa-shield"></i><div style="font-size:11px;font-weight:700">Oficial R4</div></div>
-      <div class="role-card" data-role="lider" onclick="selectRole('lider')"><i class="fas fa-crown"></i><div style="font-size:11px;font-weight:700">Lider R5</div></div>
-    </div>
-    <div id="pwdSection">
-      <input type="password" class="pwd-input" id="pwdInput" placeholder="CONTRASEÑA">
-      <button class="login-btn" onclick="doLogin()">ENTRAR</button>
-      <div id="loginError" style="font-size:11px;color:#ff5a5a;min-height:14px;margin-top:8px"></div>
+  <div class="login-screen-content">
+    <div class="login-card">
+      <div class="login-brand-icon">🛡️</div>
+      <div class="login-title">REINO 127</div>
+      <div class="login-subtitle">TFT • Call of Dragons</div>
+
+      <div class="role-grid">
+        <div class="role-card" data-role="miembro" onclick="selectRole('miembro')">
+          <i class="fas fa-user"></i>
+          <div style="font-size:11px;font-weight:700">Miembro</div>
+          <div style="font-size:8px;color:var(--green)">LIBRE</div>
+        </div>
+        <div class="role-card" data-role="oficial" onclick="selectRole('oficial')">
+          <i class="fas fa-shield"></i>
+          <div style="font-size:11px;font-weight:700">Oficial R4</div>
+        </div>
+        <div class="role-card" data-role="lider" onclick="selectRole('lider')">
+          <i class="fas fa-crown"></i>
+          <div style="font-size:11px;font-weight:700">Líder R5</div>
+        </div>
+      </div>
+
+      <div id="pwdSection">
+        <div class="password-wrap">
+          <input
+            type="password"
+            class="pwd-input"
+            id="pwdInput"
+            placeholder="CONTRASEÑA"
+            autocomplete="current-password"
+            aria-label="Contraseña"
+          >
+          <button
+            type="button"
+            class="password-toggle"
+            id="passwordToggle"
+            onclick="togglePassword()"
+            aria-label="Mostrar contraseña"
+            title="Mostrar contraseña"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+
+        <button type="button" class="login-btn" onclick="doLogin()">
+          <i class="fas fa-right-to-bracket"></i> ENTRAR
+        </button>
+
+        <div id="loginError"></div>
+        <div class="login-hint">La contraseña se oculta mientras escribes.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -116,7 +401,7 @@ function setRemoteStatus(msg,type='info'){
   <div id="viewOnlyMsg" class="hidden" style="margin:14px 16px;padding:10px;background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.2);border-radius:10px;font-size:11px;color:#64b4ff;text-align:center"><i class="fas fa-eye"></i> Modo Miembro: Solo lectura</div>
   <input type="file" id="fileInput" accept=".zip,.xlsx,.xls" multiple hidden>
   <div class="files-panel oficial-only" id="filesPanel"><div class="files-header" onclick="toggleFilesPanel()"><div style="display:flex;align-items:center;gap:8px"><i class="fas fa-folder-open" style="color:var(--accent)"></i><span style="font-size:11px;font-weight:700">Archivos cargados</span><span id="fileCount" style="font-size:9px;color:var(--muted)">0</span></div><i class="fas fa-chevron-down" id="filesChevron" style="font-size:10px;color:var(--muted)"></i></div><div class="files-list" id="filesList"></div></div>
-  <div class="stats-grid"><div class="stat-card"><div class="stat-label">Jugadores 20M+</div><div class="stat-value" id="sJ">—</div></div><div class="stat-card"><div class="stat-label">Poder Total</div><div class="stat-value" id="sP">—</div></div><div class="stat-card"><div class="stat-label">Muertes</div><div class="stat-value" style="color:var(--red)" id="sD">—</div></div><div class="stat-card"><div class="stat-label">Mérito Prom</div><div class="stat-value" style="color:var(--accent)" id="sMP">—</div></div><div class="stat-card"><div class="stat-label">Méritos Total</div><div class="stat-value" id="sMT">—</div></div><div class="stat-card"><div class="stat-label">Construcción</div><div class="stat-value" style="color:var(--blue)" id="sC">—</div></div><div class="stat-card"><div class="stat-label">Destrucción</div><div class="stat-value" style="color:var(--red)" id="sX">—</div></div></div>
+  <div class="stats-grid"><div class="stat-card"><div class="stat-label">Jugadores 20M+</div><div class="stat-value" id="sJ">—</div></div><div class="stat-card"><div class="stat-label">Poder Máx. Histórico Total</div><div class="stat-value" id="sP">—</div></div><div class="stat-card"><div class="stat-label">Muertes</div><div class="stat-value" style="color:var(--red)" id="sD">—</div></div><div class="stat-card"><div class="stat-label">Mérito Prom</div><div class="stat-value" style="color:var(--accent)" id="sMP">—</div></div><div class="stat-card"><div class="stat-label">Méritos Total</div><div class="stat-value" id="sMT">—</div></div><div class="stat-card"><div class="stat-label">Construcción</div><div class="stat-value" style="color:var(--blue)" id="sC">—</div></div><div class="stat-card"><div class="stat-label">Destrucción</div><div class="stat-value" style="color:var(--red)" id="sX">—</div></div></div>
   <nav class="tabs-bar"><button class="tab-btn active" data-tab="jugadores" onclick="switchTab('jugadores')"><i class="fas fa-users"></i> Jugadores <span id="cAll">0</span></button><button class="tab-btn" data-tab="graficos" onclick="switchTab('graficos')"><i class="fas fa-chart-bar"></i> Gráficos</button><button class="tab-btn" data-tab="noaportan" onclick="switchTab('noaportan')"><i class="fas fa-circle-xmark"></i> No Aportan <span id="cNA">0</span></button><button class="tab-btn" data-tab="sefueron" onclick="switchTab('sefueron')"><i class="fas fa-door-open"></i> Se Fueron <span id="cSF">0</span></button></nav>
   <section id="view-jugadores">
     <div class="toolbar">
@@ -129,9 +414,20 @@ function setRemoteStatus(msg,type='info'){
       <button class="btn-sm btn-settings lider-only" onclick="openConfig()"><i class="fas fa-gear"></i></button>
       <button class="btn-sm btn-danger lider-only" onclick="clearMemory()"><i class="fas fa-trash"></i> Limpiar</button>
     </div>
-    <div class="table-container"><div class="table-scroll"><table><thead><tr><th data-col="rango">#</th><th data-col="name">Jugador</th><th data-col="id">ID</th><th data-col="poder">Poder</th><th data-col="meritos">Méritos</th><th data-col="muertes">Muertes</th><th>Estado</th></tr></thead><tbody id="tBody"></tbody></table></div><div class="pagination" id="pagination"></div></div>
+    <div class="table-container"><div class="table-scroll"><table><thead><tr><th data-col="rango">#</th><th data-col="name">Jugador</th><th data-col="id">ID</th><th data-col="poder">Poder máximo histórico</th><th data-col="meritos">Méritos propios</th><th data-col="muertesT4">Muertes T4</th><th data-col="muertesT5">Muertes T5</th><th data-col="curadasT4">Curación T4</th><th data-col="curadasT5">Curación T5</th><th>Estado</th></tr></thead><tbody id="tBody"></tbody></table></div><div class="pagination" id="pagination"></div></div>
   </section>
-  <section id="view-graficos" class="hidden"><div class="charts-grid"><div class="chart-card"><div class="chart-title">Top 10 Méritos</div><div class="chart-wrap"><canvas id="chMeritos"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 15 Muertes</div><div class="chart-wrap"><canvas id="chMuertes"></canvas></div></div><div class="chart-card"><div class="chart-title">Distribución</div><div class="chart-wrap"><canvas id="chEstados"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Poder</div><div class="chart-wrap"><canvas id="chPoder"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Construcción</div><div class="chart-wrap"><canvas id="chConstruccion"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Destrucción</div><div class="chart-wrap"><canvas id="chDestruccion"></canvas></div></div></div></section>
+  <section id="view-graficos" class="hidden">
+    <div class="chart-controls">
+      <div><label>Desde</label><input type="date" id="chartDateStart" class="filter-sel"></div>
+      <div><label>Hasta</label><input type="date" id="chartDateEnd" class="filter-sel"></div>
+      <div><label>Métrica</label><select id="chartMetric" class="filter-sel"><option value="meritos">Méritos propios</option><option value="t4_muertas">Muertes T4</option><option value="t5_muertas">Muertes T5</option><option value="t4_curadas">Curación T4</option><option value="t5_curadas">Curación T5</option><option value="muertes">Muertes T4 + T5</option><option value="curadas">Curación T4 + T5</option></select></div>
+      <button class="btn-sm btn-vs" onclick="renderAllianceChart()"><i class="fas fa-rotate"></i> ACTUALIZAR</button>
+      <button class="btn-sm" onclick="resetAllianceChartDates()"><i class="fas fa-calendar-days"></i> TODO</button>
+    </div>
+    <div class="period-summary" id="periodSummary"></div>
+    <div class="chart-card alliance-chart-card"><div class="chart-title" id="allianceChartTitle">Rendimiento general de la alianza</div><div class="chart-wrap alliance-chart-wrap"><canvas id="chAlliance"></canvas></div></div>
+    <div class="charts-grid"><div class="chart-card"><div class="chart-title">Top 10 Méritos propios</div><div class="chart-wrap"><canvas id="chMeritos"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 15 Muertes T4 + T5</div><div class="chart-wrap"><canvas id="chMuertes"></canvas></div></div><div class="chart-card"><div class="chart-title">Distribución</div><div class="chart-wrap"><canvas id="chEstados"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Poder</div><div class="chart-wrap"><canvas id="chPoder"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Curación T4 + T5</div><div class="chart-wrap"><canvas id="chCuracion"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Muertes T4</div><div class="chart-wrap"><canvas id="chMuertesT4"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Muertes T5</div><div class="chart-wrap"><canvas id="chMuertesT5"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Curación T4</div><div class="chart-wrap"><canvas id="chCuracionT4"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Curación T5</div><div class="chart-wrap"><canvas id="chCuracionT5"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Construcción</div><div class="chart-wrap"><canvas id="chConstruccion"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Destrucción</div><div class="chart-wrap"><canvas id="chDestruccion"></canvas></div></div></div>
+  </section>
   <div class="modal-overlay" id="modalOverlay"><div class="modal-content">
     <div style="display:flex;justify-content:space-between"><div><div style="font-weight:900;font-size:18px;color:var(--accent)" id="mName"></div><div style="font-size:10px;color:var(--muted)" id="mId"></div></div><button onclick="closeModal()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div>
     <div id="mStatus" style="padding:9px;border-radius:10px;font-weight:700;text-align:center;font-size:11px;margin:12px 0"></div>
@@ -140,12 +436,18 @@ function setRemoteStatus(msg,type='info'){
     <div class="oficial-only"><div style="font-size:10px;font-weight:700;color:var(--blue)"><i class="fas fa-sticky-note"></i> NOTA</div><textarea class="note-area" id="noteArea" placeholder="Ej: Vacaciones..."></textarea><button onclick="saveNote()" style="padding:6px 14px;background:var(--blue-d);border:1px solid rgba(100,180,255,.3);border-radius:8px;color:var(--blue);font-size:10px;font-weight:700;cursor:pointer"><i class="fas fa-save"></i> Guardar nota</button></div>
     <div class="detail-canvas-wrap"><div class="chart-title">Méritos por día</div><canvas id="mChartMeritos" height="160"></canvas></div>
     <div class="detail-canvas-wrap"><div class="chart-title">Muertes por día</div><canvas id="mChartMuertes" height="160"></canvas></div>
-    <div class="detail-canvas-wrap"><div class="chart-title">Construcción y destrucción por día</div><canvas id="mChartTiempo" height="160"></canvas></div>
+    <div class="detail-canvas-wrap"><div class="chart-title">🏗️ Construcción por día</div><canvas id="mChartConstruccion" height="160"></canvas></div>
+    <div class="detail-canvas-wrap"><div class="chart-title">⚔️ Destrucción por día</div><canvas id="mChartDestruccion" height="160"></canvas></div>
+    <div class="detail-canvas-wrap"><div class="chart-title">💚 Curación T4 y T5 por día</div><canvas id="mChartCuracion" height="180"></canvas></div>
     <div class="detail-canvas-wrap"><div class="chart-title">Méritos por tipo de tropa</div><canvas id="mChartTropas" height="180"></canvas><div id="troopBreakdown" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px"></div></div>
     <button id="btnExport" onclick="exportarJugadorExcel()" style="width:100%;margin:10px 0;padding:11px;background:linear-gradient(135deg,#00ff88,#00cc6a);border:none;border-radius:10px;color:#000;font-weight:900;cursor:pointer"><i class="fas fa-file-excel"></i> EXPORTAR <span id="mExportName"></span></button>
     <div id="mHist" style="font-size:11px"></div>
   </div></div>
-  <div class="modal-overlay" id="compareOverlay"><div class="modal-content" style="max-width:800px"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><div style="font-weight:900;color:var(--accent)"><i class="fas fa-code-compare"></i> COMPARADOR</div><button onclick="closeCompare()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label style="font-size:9px;color:var(--muted)">Jugador 1</label><select id="compare1" class="compare-input"></select></div><div><label style="font-size:9px;color:var(--muted)">Jugador 2</label><select id="compare2" class="compare-input"></select></div></div><button onclick="runCompare()" style="width:100%;padding:10px;background:var(--accent);border:none;border-radius:8px;color:#000;font-weight:900;cursor:pointer;margin:10px 0">⚔️ COMPARAR</button><div id="compareResult" class="hidden"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0" id="compareStats"></div><div class="detail-canvas-wrap"><canvas id="compareChartMeritos" height="180"></canvas></div><div id="compareWinner" style="padding:12px;border-radius:10px;text-align:center;font-weight:900;margin-top:10px"></div></div></div></div>
+  <div class="modal-overlay" id="compareOverlay"><div class="modal-content" style="max-width:800px"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><div style="font-weight:900;color:var(--accent)"><i class="fas fa-code-compare"></i> COMPARADOR</div><button onclick="closeCompare()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label style="font-size:9px;color:var(--muted)">Jugador 1</label><select id="compare1" class="compare-input"></select></div><div><label style="font-size:9px;color:var(--muted)">Jugador 2</label><select id="compare2" class="compare-input"></select></div></div><button onclick="runCompare()" style="width:100%;padding:10px;background:var(--accent);border:none;border-radius:8px;color:#000;font-weight:900;cursor:pointer;margin:10px 0">⚔️ COMPARAR</button><div id="compareResult" class="hidden"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0" id="compareStats"></div><div class="detail-canvas-wrap">
+  <div class="chart-title">Evolución de méritos propios</div>
+  <div style="font-size:9px;color:var(--muted);margin:-4px 0 8px">El detalle superior compara también muertes T4/T5 y curación T4/T5.</div>
+  <canvas id="compareChartMeritos" height="180"></canvas>
+</div><div id="compareWinner" style="padding:12px;border-radius:10px;text-align:center;font-weight:900;margin-top:10px"></div></div></div></div>
   <div class="modal-overlay" id="configOverlay"><div class="modal-content" style="max-width:500px"><div style="display:flex;justify-content:space-between;margin-bottom:16px"><div style="font-weight:900;color:var(--accent)"><i class="fas fa-gear"></i> CONFIG</div><button onclick="closeConfig()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div><div class="config-row"><div class="config-label">Poder mínimo</div><input type="number" class="config-input" id="cfgPoderMin"></div><div class="config-row"><div class="config-label">Umbral No Aporta</div><input type="number" class="config-input" id="cfgUmbral"></div><div class="config-row"><div class="config-label">% mínimo</div><input type="number" class="config-input" id="cfgPct" step="0.1"></div><div class="config-row"><div class="config-label">Poder dorado</div><input type="number" class="config-input" id="cfgGold"></div><div class="config-row"><div class="config-label">Días para Se fue</div><input type="number" class="config-input" id="cfgDias"></div><button onclick="saveConfig()" style="width:100%;margin-top:14px;padding:11px;background:linear-gradient(135deg,#64b4ff,#3b82f6);border:none;border-radius:10px;color:#000;font-weight:900;cursor:pointer"><i class="fas fa-save"></i> GUARDAR</button></div></div>
 </div>
 <div id="toastBox" style="position:fixed;top:70px;right:16px;z-index:999999;display:flex;flex-direction:column;gap:6px"></div>
@@ -155,7 +457,7 @@ function safeSessionGet(key){try{return sessionStorage.getItem(key);}catch(e){re
 function safeSessionSet(key,value){try{sessionStorage.setItem(key,value);}catch(e){}}
 function safeSessionRemove(key){try{sessionStorage.removeItem(key);}catch(e){}}
 
-const PASS_MAP={miembro:'',oficial:'oficiales',lider:'r5'};
+const PASS_MAP={miembro:'',oficial:'r4',lider:'lider'}; // R4: r4 | R5: lider
 const CREDS={miembro:{level:1,label:'Miembro'},oficial:{level:2,label:'Oficial'},lider:{level:3,label:'Líder'}};
 const PER_PAGE=50;
 let session=null,allData={},fileParsed=[],playerNotes={},computed=[],currentPage=1,sortCol='rango',sortDir='asc',charts={},modalCharts={},compareCharts={},currentModalId=null,selectedRole=null;
@@ -306,21 +608,148 @@ async function deleteFile(idx){
   for(const id in allData){allData[id].history=allData[id].history.filter(h=>h.fileName!==f.name);if(allData[id].history.length===0)delete allData[id];}
   fileParsed.splice(idx,1);await saveToStorage();renderFilesList();analyze(true);toast('Eliminado','success');
 }
-function selectRole(r){selectedRole=r;document.querySelectorAll('.role-card').forEach(c=>c.classList.toggle('selected',c.dataset.role===r));if(r==='miembro'){session={role:r,level:1,t:Date.now()};safeSessionSet('r127_session',JSON.stringify(session));enterApp();}else{document.getElementById('pwdSection').classList.add('show');}}
+function selectRole(r){
+  selectedRole=r;
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.toggle('selected',c.dataset.role===r));
+  const pwd=document.getElementById('pwdSection');
+  const input=document.getElementById('pwdInput');
+  const error=document.getElementById('loginError');
+  error.textContent='';
+  input.value='';
+  input.type='password';
+  const icon=document.querySelector('#passwordToggle i');
+  if(icon)icon.className='fas fa-eye';
+
+  if(r==='miembro'){
+    pwd.classList.remove('show');
+    session={role:r,level:1,t:Date.now()};
+    safeSessionSet('r127_session',JSON.stringify(session));
+    enterApp();
+  }else{
+    pwd.classList.add('show');
+    setTimeout(()=>input.focus(),180);
+  }
+}
 document.getElementById('pwdInput').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-function doLogin(){if(!selectedRole)return;if(selectedRole==='miembro'){session={role:'miembro',level:1,t:Date.now()};safeSessionSet('r127_session',JSON.stringify(session));enterApp();return;}const inp=document.getElementById('pwdInput').value.trim();if(inp===PASS_MAP[selectedRole]){session={role:selectedRole,level:CREDS[selectedRole].level,t:Date.now()};safeSessionSet('r127_session',JSON.stringify(session));enterApp();}else{document.getElementById('loginError').textContent='Incorrecta - R4: oficiales / R5: r5';}}
+
 async function enterApp(){
-  document.getElementById('loginScreen').style.display='none';document.getElementById('mainApp').classList.remove('hidden');
-  document.getElementById('roleBadge').textContent=CREDS[session.role].label;
-  const isMiembro=session.role==='miembro';
-  document.getElementById('uploadZone').classList.toggle('hidden',isMiembro);
-  document.getElementById('viewOnlyMsg').classList.toggle('hidden',!isMiembro);
-  document.querySelectorAll('.oficial-only').forEach(el=>el.classList.toggle('hidden',session.level<2));
-  document.querySelectorAll('.lider-only').forEach(el=>el.classList.toggle('hidden',session.role!=='lider'));
-  document.getElementById('btnExport').classList.toggle('hidden',isMiembro);
-  const loaded=await loadFromStorage();
-  if(!loaded){document.getElementById('memInfo').textContent=isMiembro?'Solo lectura - sin datos':'Sube tu ZIP (IndexedDB)';}
-  renderFilesList();
+  try{
+    const login=document.getElementById('loginScreen');
+    const main=document.getElementById('mainApp');
+
+    if(login) login.style.display='none';
+    if(main) main.classList.remove('hidden');
+
+    const role=session?.role || 'miembro';
+    const creds=CREDS[role] || CREDS.miembro;
+
+    const badge=document.getElementById('roleBadge');
+    if(badge) badge.textContent=creds.label;
+
+    const isMiembro=role==='miembro';
+    const level=Number(session?.level || creds.level || 1);
+
+    const upload=document.getElementById('uploadZone');
+    const viewOnly=document.getElementById('viewOnlyMsg');
+    if(upload) upload.classList.toggle('hidden', level<2);
+    if(viewOnly) viewOnly.classList.toggle('hidden', !isMiembro);
+
+    document.querySelectorAll('.oficial-only').forEach(el=>{
+      el.classList.toggle('hidden', level<2);
+    });
+    document.querySelectorAll('.lider-only').forEach(el=>{
+      el.classList.toggle('hidden', role!=='lider');
+    });
+
+    const exportBtn=document.getElementById('btnExport');
+    if(exportBtn) exportBtn.classList.toggle('hidden', level<2);
+
+    const loaded=await loadFromStorage();
+
+    const memInfo=document.getElementById('memInfo');
+    if(!loaded && memInfo){
+      memInfo.textContent=isMiembro
+        ? 'Solo lectura - sin datos'
+        : 'Sube tu ZIP para comenzar';
+    }
+
+    if(typeof renderFilesList==='function') renderFilesList();
+
+    const pwd=document.getElementById('pwdSection');
+    if(pwd) pwd.classList.remove('show');
+
+    const pwdInput=document.getElementById('pwdInput');
+    if(pwdInput) pwdInput.value='';
+
+    const loginError=document.getElementById('loginError');
+    if(loginError) loginError.textContent='';
+
+    toast('Bienvenido '+creds.label,'success');
+  }catch(err){
+    console.error('ENTER APP ERROR:',err);
+    const loginError=document.getElementById('loginError');
+    if(loginError){
+      loginError.textContent='No se pudo abrir el TFT: '+(err?.message || 'error desconocido');
+    }
+    const login=document.getElementById('loginScreen');
+    const main=document.getElementById('mainApp');
+    if(login) login.style.display='grid';
+    if(main) main.classList.add('hidden');
+  }
+}
+
+function doLogin(){
+  if(!selectedRole){
+    document.getElementById('loginError').textContent='Selecciona un rol.';
+    return;
+  }
+
+  const error=document.getElementById('loginError');
+  const input=document.getElementById('pwdInput');
+  error.textContent='';
+
+  if(selectedRole==='miembro'){
+    session={role:'miembro',level:1,t:Date.now()};
+    safeSessionSet('r127_session',JSON.stringify(session));
+    enterApp().catch(err=>{
+      console.error('Error entrando al TFT:',err);
+      error.textContent='No se pudo abrir el TFT: '+(err?.message||'error desconocido');
+    });
+    return;
+  }
+
+  const inp=String(input?.value||'').trim().toLowerCase();
+  const expected=String(PASS_MAP[selectedRole]||'').trim().toLowerCase();
+
+  if(inp && inp===expected){
+    session={
+      role:selectedRole,
+      level:CREDS[selectedRole].level,
+      t:Date.now()
+    };
+    safeSessionSet('r127_session',JSON.stringify(session));
+
+    enterApp().catch(err=>{
+      console.error('Error entrando al TFT:',err);
+      error.textContent='No se pudo abrir el TFT: '+(err?.message||'error desconocido');
+    });
+  }else{
+    error.textContent='Contraseña incorrecta.';
+    if(input){
+      input.focus();
+      input.select();
+    }
+  }
+}
+function togglePassword(){
+  const input=document.getElementById('pwdInput');
+  const btn=document.getElementById('passwordToggle');
+  const icon=btn.querySelector('i');
+  const showing=input.type==='text';
+  input.type=showing?'password':'text';
+  icon.className=showing?'fas fa-eye':'fas fa-eye-slash';
+  btn.setAttribute('aria-label',showing?'Mostrar contraseña':'Ocultar contraseña');
+  btn.title=showing?'Mostrar contraseña':'Ocultar contraseña';
 }
 function doLogout(){session=null;safeSessionRemove('r127_session');location.reload();}
 (async function(){const s=safeSessionGet('r127_session');if(s){try{const j=JSON.parse(s);if(Date.now()-j.t<86400000){session=j;await enterApp();}}catch(e){}}})();
@@ -499,15 +928,19 @@ function analyze(isLoad=false){
     const h=allData[id].history.filter(x=>x&&x.date).sort((a,b)=>a.date-b.date);
     if(!h.length)continue;
     const last=h[h.length-1];
-    if(last.poder<config.poderMin)continue;
+    if(last.poder_maximo<config.poderMin)continue;
     const sum=k=>h.reduce((a,x)=>a+num(x[k]),0);
-    const dM=sum('meritos'),dD=sum('muertes'),dC=sum('construccion'),dX=sum('destruccion');
+    // IMPORTANTE: "Total de méritos" ya representa los méritos del jugador.
+    // "Méritos enemigos" se mantiene separado y NUNCA se suma al rendimiento.
+    const dM=sum('meritos'),dT4=sum('t4_muertas'),dT5=sum('t5_muertas'),dD=dT4+dT5;
+    const dCT4=sum('t4_curadas'),dCT5=sum('t5_curadas'),dC=dCT4+dCT5;
+    const dX=sum('destruccion'),dBuild=sum('construccion');
     const inf=sum('infanteria'),cab=sum('caballeria'),arc=sum('arqueros'),mag=sum('magos'),otr=sum('otros');
     const estabaEnUltimo=h.some(x=>x.dateKey===latestDateKey);
     const seFue=!estabaEnUltimo;
     let st='PELEA';if(seFue)st='SE FUE';else if(h.length===1&&!isLoad)st='NUEVO';else if(dM<config.umbralNoAporta)st='NO APORTA';
-    tP+=last.poder;tM+=dM;tD+=dD;tC+=dC;tX+=dX;
-    computed.push({id,name:allData[id].name,poder:last.poder,meritos:dM,muertes:dD,construccion:dC,destruccion:dX,infanteria:inf,caballeria:cab,arqueros:arc,magos:mag,otros:otr,status:st,rango:0,history:h,seFue});
+    tP+=num(last.poder_maximo);tM+=dM;tD+=dD;tC+=dBuild;tX+=dX;
+    computed.push({id,name:allData[id].name,poder:num(last.poder_maximo),poderActual:num(last.poder),meritos:dM,muertes:dD,muertesT4:dT4,muertesT5:dT5,curadas:dC,curadasT4:dCT4,curadasT5:dCT5,construccion:dBuild,destruccion:dX,infanteria:inf,caballeria:cab,arqueros:arc,magos:mag,otros:otr,status:st,rango:0,history:h,seFue});
   }
   computed.sort((a,b)=>b.meritos-a.meritos);computed.forEach((c,i)=>c.rango=i+1);
   document.getElementById('sJ').textContent=computed.filter(c=>c.status!=='SE FUE').length;
@@ -519,6 +952,7 @@ function analyze(isLoad=false){
   document.getElementById('cSF').textContent=computed.filter(c=>c.status==='SE FUE').length;
   currentPage=1;renderTable();fillCompareSelects();
 }
+
 function fmtTime(sec){
   sec=Math.max(0,Math.round(num(sec)));const d=Math.floor(sec/86400);sec%=86400;const h=Math.floor(sec/3600);sec%=3600;const m=Math.floor(sec/60);const s=sec%60;
   if(d)return `${d}d ${String(h).padStart(2,'0')}h`;if(h)return `${h}h ${String(m).padStart(2,'0')}m`;if(m)return `${m}m ${String(s).padStart(2,'0')}s`;return `${s}s`;
@@ -552,33 +986,73 @@ document.querySelectorAll('th[data-col]').forEach(th=>{th.addEventListener('clic
 function renderTable(){
   const rows=getFiltered();const tp=Math.max(1,Math.ceil(rows.length/PER_PAGE));if(currentPage>tp)currentPage=tp;
   const page=rows.slice((currentPage-1)*PER_PAGE,(currentPage-1)*PER_PAGE+PER_PAGE);
-  let html='';for(const r of page){let bc=r.status==='PELEA'?'b-pelea':r.status==='NO APORTA'?'b-noaporta':r.status==='NUEVO'?'b-nuevo':'b-sefue';const isGold=r.poder>=config.poderGold;const noteDot=playerNotes[r.id]&&playerNotes[r.id].trim()?'<span class="note-dot"></span>':'';html+=`<tr data-id="${esc(r.id)}"><td style="font-weight:900;color:${r.rango<=3?'#f5c518':'#8e93b0'}">${r.rango}</td><td style="font-weight:700" class="${isGold?'poder-gold':''}">${esc(r.name)}${noteDot}</td><td style="font-size:9px;color:var(--muted);font-family:monospace" title="${esc(r.id)}">${esc(r.id.slice(-8))}</td><td class="${isGold?'poder-gold':''}">${fmt(r.poder)}</td><td>${fmt(r.meritos)}</td><td>${fmt(r.muertes)}</td><td><span class="badge ${bc}">${esc(r.status)}</span></td></tr>`;}
-  document.getElementById('tBody').innerHTML=html||`<tr><td colspan=7 style="text-align:center;padding:30px;color:#8e93b0">Sin resultados</td></tr>`;
+  let html='';for(const r of page){let bc=r.status==='PELEA'?'b-pelea':r.status==='NO APORTA'?'b-noaporta':r.status==='NUEVO'?'b-nuevo':'b-sefue';const isGold=r.poder>=config.poderGold;const noteDot=playerNotes[r.id]&&playerNotes[r.id].trim()?'<span class="note-dot"></span>':'';html+=`<tr data-id="${esc(r.id)}"><td style="font-weight:900;color:${r.rango<=3?'#f5c518':'#8e93b0'}">${r.rango}</td><td style="font-weight:700" class="${isGold?'poder-gold':''}">${esc(r.name)}${noteDot}</td><td style="font-size:9px;color:var(--muted);font-family:monospace" title="${esc(r.id)}">${esc(r.id.slice(-8))}</td><td class="${isGold?'poder-gold':''}">${fmt(r.poder)}</td><td>${fmt(r.meritos)}</td><td>${fmt(r.muertesT4)}</td><td>${fmt(r.muertesT5)}</td><td>${fmt(r.curadasT4)}</td><td>${fmt(r.curadasT5)}</td><td><span class="badge ${bc}">${esc(r.status)}</span></td></tr>`;}
+  document.getElementById('tBody').innerHTML=html||`<tr><td colspan=10 style="text-align:center;padding:30px;color:#8e93b0">Sin resultados</td></tr>`;
   document.querySelectorAll('#tBody tr[data-id]').forEach(tr=>tr.addEventListener('click',()=>openModal(tr.dataset.id)));
   const pag=document.getElementById('pagination');if(tp<=1){pag.innerHTML='';return;}let pp=`<button class="pg-btn" onclick="goP(${currentPage-1})"><</button>`;for(let i=1;i<=Math.min(tp,7);i++){pp+=`<button class="pg-btn ${i===currentPage?'active':''}" onclick="goP(${i})">${i}</button>`;}pp+=`<button class="pg-btn" onclick="goP(${currentPage+1})">></button>`;pag.innerHTML=pp;
 }
 function goP(p){const rows=getFiltered();const tp=Math.max(1,Math.ceil(rows.length/PER_PAGE));if(p<1||p>tp)return;currentPage=p;renderTable();}
 function copyInactivos(){if(session.level<2){toast('Solo R4 y R5','error');return;}const inactivos=computed.filter(c=>c.status==='NO APORTA');let txt=`🚨 NO APORTAN - ${inactivos.length}:\n`;inactivos.forEach((p,i)=>{txt+=`${i+1}. ${p.name} [${p.id}] - ${fmt(p.poder)}\n`;});navigator.clipboard.writeText(txt).then(()=>toast('Copiado'));}
-function exportFullReport(){if(session.level<2){toast('Solo R4 y R5','error');return;}const data=computed.map(c=>({'#':c.rango,'Nombre':c.name,'ID':c.id,'Poder':c.poder,'Méritos':c.meritos,'Muertes':c.muertes,'%':(c.meritos/c.poder*100).toFixed(2)+'%','Estado':c.status,'Nota':playerNotes[c.id]||''}));const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Reporte');XLSX.writeFile(wb,`REINO127_Reporte_${new Date().toISOString().slice(0,10)}.xlsx`);}
+function exportFullReport(){if(session.level<2){toast('Solo R4 y R5','error');return;}const data=computed.map(c=>({'#':c.rango,'Nombre':c.name,'ID':c.id,'Poder máximo histórico':c.poder,'Poder actual (último día)':c.poderActual,'Méritos propios':c.meritos,'Muertes T4':c.muertesT4,'Muertes T5':c.muertesT5,'Curación T4':c.curadasT4,'Curación T5':c.curadasT5,'Muertes totales':c.muertes,'Curación total':c.curadas,'%':(c.meritos/c.poder*100).toFixed(2)+'%','Estado':c.status,'Nota':playerNotes[c.id]||''}));const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Reporte');XLSX.writeFile(wb,`REINO127_Reporte_${new Date().toISOString().slice(0,10)}.xlsx`);}
+function getAllianceDateBounds(){
+  const dates=fileParsed.map(f=>f.dateKey).filter(Boolean).sort();
+  return {min:dates[0]||'',max:dates[dates.length-1]||''};
+}
+function initAllianceChartDates(){
+  const b=getAllianceDateBounds();
+  const a=document.getElementById('chartDateStart'),z=document.getElementById('chartDateEnd');
+  if(a&&z){a.min=b.min;a.max=b.max;z.min=b.min;z.max=b.max;if(!a.value)a.value=b.min;if(!z.value)z.value=b.max;}
+}
+function resetAllianceChartDates(){
+  const b=getAllianceDateBounds();document.getElementById('chartDateStart').value=b.min;document.getElementById('chartDateEnd').value=b.max;renderAllianceChart();
+}
+function getPeriodForPlayer(p,start,end){
+  return p.history.filter(h=>{const k=h.dateKey||new Date(h.date).toISOString().slice(0,10);return (!start||k>=start)&&(!end||k<=end);});
+}
+function getAlliancePeriodRows(start,end){
+  const rows=[];
+  for(const id in allData){
+    const p=allData[id],h=getPeriodForPlayer(p,start,end);if(!h.length)continue;
+    const sum=k=>h.reduce((a,x)=>a+num(x[k]),0);
+    const last=h[h.length-1];
+    rows.push({id,name:String(p.name||'?'),poder:num(last.poder),meritos:sum('meritos'),muertes:sum('t4_muertas')+sum('t5_muertas'),t4_muertas:sum('t4_muertas'),t5_muertas:sum('t5_muertas'),curadas:sum('t4_curadas')+sum('t5_curadas'),t4_curadas:sum('t4_curadas'),t5_curadas:sum('t5_curadas'),construccion:sum('construccion'),destruccion:sum('destruccion'),days:h.length});
+  }
+  return rows;
+}
+function renderAllianceChart(){
+  initAllianceChartDates();
+  const start=document.getElementById('chartDateStart').value,end=document.getElementById('chartDateEnd').value,metric=document.getElementById('chartMetric').value;
+  if(start&&end&&start>end){toast('La fecha inicial no puede ser mayor a la final','error');return;}
+  const rows=getAlliancePeriodRows(start,end).sort((a,b)=>num(b[metric])-num(a[metric]));
+  const labels={meritos:'Méritos propios',t4_muertas:'Muertes T4',t5_muertas:'Muertes T5',curadasT4:'Curación T4',curadasT5:'Curación T5',t4_curadas:'Curación T4',t5_curadas:'Curación T5',muertes:'Muertes T4 + T5',curadas:'Curación T4 + T5'};
+  document.getElementById('allianceChartTitle').textContent=`Toda la alianza • ${labels[metric]||metric} • ${start||'inicio'} → ${end||'hoy'}`;
+  const totals={meritos:rows.reduce((a,r)=>a+r.meritos,0),muertes:rows.reduce((a,r)=>a+r.muertes,0),curadas:rows.reduce((a,r)=>a+r.curadas,0),t4m:rows.reduce((a,r)=>a+r.t4_muertas,0),t5m:rows.reduce((a,r)=>a+r.t5_muertas,0),t4c:rows.reduce((a,r)=>a+r.t4_curadas,0),t5c:rows.reduce((a,r)=>a+r.t5_curadas,0)};
+  document.getElementById('periodSummary').innerHTML=`<div class="period-card"><div class="label">Jugadores con datos</div><div class="value">${rows.length}</div></div><div class="period-card"><div class="label">Méritos propios</div><div class="value" style="color:var(--accent)">${fmt(totals.meritos)}</div></div><div class="period-card"><div class="label">Muertes T4 / T5</div><div class="value" style="color:var(--red)">${fmt(totals.t4m)} / ${fmt(totals.t5m)}</div></div><div class="period-card"><div class="label">Curación T4 / T5</div><div class="value" style="color:var(--green)">${fmt(totals.t4c)} / ${fmt(totals.t5c)}</div></div><div class="period-card"><div class="label">Días seleccionados</div><div class="value">${rows.length?Math.max(...rows.map(r=>r.days)):0}</div></div>`;
+  if(charts.alliance){try{charts.alliance.destroy();}catch(e){}}
+  const canvas=document.getElementById('chAlliance');
+  charts.alliance=new Chart(canvas,{type:'bar',data:{labels:rows.map(r=>r.name),datasets:[{label:labels[metric]||metric,data:rows.map(r=>num(r[metric])),borderRadius:5}]},options:{plugins:{legend:{display:false}},indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+}
 function renderCharts(){
-  if(!computed.length)return;Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
+  if(!computed.length)return;Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};initAllianceChartDates();
   const makeBar=(id,rows,key,limit)=>{const rs=[...rows].sort((a,b)=>b[key]-a[key]).slice(0,limit);return new Chart(document.getElementById(id),{type:'bar',data:{labels:rs.map(r=>r.name),datasets:[{data:rs.map(r=>r[key]),borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}})};
   charts.meritos=makeBar('chMeritos',computed,'meritos',10);charts.muertes=makeBar('chMuertes',computed,'muertes',15);
   const est={PELEA:0,'NO APORTA':0,NUEVO:0,'SE FUE':0};computed.forEach(c=>est[c.status]++);
   charts.estados=new Chart(document.getElementById('chEstados'),{type:'doughnut',data:{labels:Object.keys(est),datasets:[{data:Object.values(est)}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%'}});
-  charts.poder=makeBar('chPoder',computed,'poder',10);charts.construccion=makeBar('chConstruccion',computed,'construccion',10);charts.destruccion=makeBar('chDestruccion',computed,'destruccion',10);
+  charts.poder=makeBar('chPoder',computed,'poder',10);charts.curacion=makeBar('chCuracion',computed,'curadas',10);charts.muertesT4=makeBar('chMuertesT4',computed,'muertesT4',10);charts.muertesT5=makeBar('chMuertesT5',computed,'muertesT5',10);charts.curacionT4=makeBar('chCuracionT4',computed,'curadasT4',10);charts.curacionT5=makeBar('chCuracionT5',computed,'curadasT5',10);charts.construccion=makeBar('chConstruccion',computed,'construccion',10);charts.destruccion=makeBar('chDestruccion',computed,'destruccion',10);
+  renderAllianceChart();
 }
+
 function openModal(id){
   currentModalId=id;const p=computed.find(c=>c.id===id);if(!p)return;
   document.getElementById('mName').textContent=p.name;document.getElementById('mId').textContent='ID: '+p.id;document.getElementById('mExportName').textContent=p.name.toUpperCase();
   const se=document.getElementById('mStatus');se.textContent=p.seFue?'🚪 SE FUE':'✅ EN REINO 127';se.style.background=p.seFue?'rgba(255,90,90,.15)':'rgba(0,255,136,.15)';se.style.color=p.seFue?'#ff5a5a':'#00ff88';
   const histSorted=[...p.history].sort((a,b)=>a.date-b.date);
   const labels=histSorted.map(h=>dayLabel(h.date));
-  const dMArr=histSorted.map(h=>num(h.meritos)),dMuArr=histSorted.map(h=>num(h.muertes)),dCArr=histSorted.map(h=>num(h.construccion)),dXArr=histSorted.map(h=>num(h.destruccion));
-  const acumM=dMArr.reduce((a,b)=>a+b,0),acumD=dMuArr.reduce((a,b)=>a+b,0),acumC=dCArr.reduce((a,b)=>a+b,0),acumX=dXArr.reduce((a,b)=>a+b,0);
+  const dMArr=histSorted.map(h=>num(h.meritos)),dMuArr=histSorted.map(h=>num(h.t4_muertas)+num(h.t5_muertas)),dMu4Arr=histSorted.map(h=>num(h.t4_muertas)),dMu5Arr=histSorted.map(h=>num(h.t5_muertas)),dC4Arr=histSorted.map(h=>num(h.t4_curadas)),dC5Arr=histSorted.map(h=>num(h.t5_curadas)),dCArr=histSorted.map(h=>num(h.construccion)),dXArr=histSorted.map(h=>num(h.destruccion));
+  const acumM=dMArr.reduce((a,b)=>a+b,0),acumD=dMuArr.reduce((a,b)=>a+b,0),acumD4=dMu4Arr.reduce((a,b)=>a+b,0),acumD5=dMu5Arr.reduce((a,b)=>a+b,0),acumC4=dC4Arr.reduce((a,b)=>a+b,0),acumC5=dC5Arr.reduce((a,b)=>a+b,0),acumC=dCArr.reduce((a,b)=>a+b,0),acumX=dXArr.reduce((a,b)=>a+b,0);
   const pct=p.poder>0?(acumM/p.poder*100):0,cumple=pct>=config.pctMinimo;
   const troopTotal=p.infanteria+p.caballeria+p.arqueros+p.magos+p.otros;
-  document.getElementById('mStats').innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Poder</div><div style="font-weight:900">${fmt(p.poder)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Méritos</div><div style="font-weight:900;color:var(--accent)">${fmt(acumM)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Muertes</div><div style="font-weight:900;color:var(--red)">${fmt(acumD)}</div></div><div style="background:${cumple?'rgba(0,255,136,.12)':'rgba(255,90,90,.12)'};border:1px solid ${cumple?'#00ff88':'#ff5a5a'};border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">% Poder</div><div style="font-weight:900;color:${cumple?'#00ff88':'#ff5a5a'}">${pct.toFixed(2)}%</div></div>`;
+  document.getElementById('mStats').innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Poder máximo histórico</div><div style="font-weight:900">${fmt(p.poder)}</div><div style="font-size:8px;color:var(--muted);margin-top:3px">Actual: ${fmt(p.poderActual||0)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Méritos</div><div style="font-weight:900;color:var(--accent)">${fmt(acumM)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Muertes</div><div style="font-weight:900;color:var(--red)">${fmt(acumD)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Muertes T4 / T5</div><div style="font-weight:900;color:var(--red)">${fmt(acumD4)} / ${fmt(acumD5)}</div></div><div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">Curación T4 / T5</div><div style="font-weight:900;color:var(--green)">${fmt(acumC4)} / ${fmt(acumC5)}</div></div><div style="background:${cumple?'rgba(0,255,136,.12)':'rgba(255,90,90,.12)'};border:1px solid ${cumple?'#00ff88':'#ff5a5a'};border-radius:8px;padding:10px;text-align:center"><div style="font-size:8px;color:var(--muted)">% Poder</div><div style="font-weight:900;color:${cumple?'#00ff88':'#ff5a5a'}">${pct.toFixed(2)}%</div></div>`;
   document.getElementById('mTotalMeritos').textContent=fmt(acumM);document.getElementById('mTotalMeritosBreak').textContent=`${histSorted.length} días • ${pct.toFixed(2)}% del poder`;
   document.getElementById('mTotalMuertes').textContent=fmt(acumD);document.getElementById('mTotalConstruccion').textContent=fmtTime(acumC);document.getElementById('mTotalDestruccion').textContent=fmtTime(acumX);
   document.getElementById('noteArea').value=playerNotes[id]||'';
@@ -592,8 +1066,29 @@ function openModal(id){
   Object.values(modalCharts).forEach(c=>{try{c.destroy();}catch(e){}});modalCharts={};
   setTimeout(()=>{
     modalCharts.meritos=new Chart(document.getElementById('mChartMeritos'),{type:'line',data:{labels,datasets:[{label:'Méritos',data:dMArr,fill:true,tension:.25}]},options:{responsive:true,plugins:{legend:{display:false}}}});
-    modalCharts.muertes=new Chart(document.getElementById('mChartMuertes'),{type:'bar',data:{labels,datasets:[{label:'Muertes',data:dMuArr}]},options:{responsive:true,plugins:{legend:{display:false}}}});
-    modalCharts.tiempo=new Chart(document.getElementById('mChartTiempo'),{type:'bar',data:{labels,datasets:[{label:'Construcción',data:dCArr},{label:'Destrucción',data:dXArr}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
+    modalCharts.muertes=new Chart(document.getElementById('mChartMuertes'),{type:'bar',data:{labels,datasets:[{label:'Muertes T4',data:dMu4Arr},{label:'Muertes T5',data:dMu5Arr}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
+    modalCharts.construccion=new Chart(document.getElementById('mChartConstruccion'),{type:'bar',data:{labels,datasets:[{label:'Construcción',data:dCArr}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+    modalCharts.destruccion=new Chart(document.getElementById('mChartDestruccion'),{type:'bar',data:{labels,datasets:[{label:'Destrucción',data:dXArr}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+    modalCharts.curacion=new Chart(document.getElementById('mChartCuracion'),{
+      type:'line',
+      data:{
+        labels,
+        datasets:[
+          {label:'Curación T4',data:dC4Arr,tension:.25,pointRadius:3},
+          {label:'Curación T5',data:dC5Arr,tension:.25,pointRadius:3}
+        ]
+      },
+      options:{
+        responsive:true,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{display:true,position:'top'}
+        },
+        scales:{
+          y:{beginAtZero:true}
+        }
+      }
+    });
     modalCharts.tropas=new Chart(document.getElementById('mChartTropas'),{type:'doughnut',data:{labels:troopLabels,datasets:[{data:troopData}]},options:{responsive:true,cutout:'55%'}});
   },100);
   document.getElementById('modalOverlay').classList.add('active');
@@ -603,27 +1098,34 @@ function closeModal(){document.getElementById('modalOverlay').classList.remove('
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target.id==='modalOverlay')closeModal();});
 function exportarJugadorExcel(){
   if(session.role==='miembro'){toast('Solo R4 y R5','error');return;}if(!currentModalId)return;const p=computed.find(c=>c.id===currentModalId);const hist=[...p.history].sort((a,b)=>a.date-b.date);let acumM=0,acumD=0,acumC=0,acumX=0;const data=[];
-  hist.forEach(h=>{acumM+=num(h.meritos);acumD+=num(h.muertes);acumC+=num(h.construccion);acumX+=num(h.destruccion);data.push({'Fecha':h.dateKey,'Nombre':p.name,'ID':p.id,'Poder':h.poder,'Méritos del día':h.meritos,'Muertes del día':h.muertes,'Construcción (s)':h.construccion,'Destrucción (s)':h.destruccion,'Infantería':h.infanteria,'Caballería':h.caballeria,'Arqueros':h.arqueros,'Magos':h.magos,'Otros méritos':h.otros,'Méritos acumulados':acumM,'Muertes acumuladas':acumD,'Construcción acumulada (s)':acumC,'Destrucción acumulada (s)':acumX});});
+  hist.forEach(h=>{acumM+=num(h.meritos);acumD+=num(h.muertes);acumC+=num(h.construccion);acumX+=num(h.destruccion);data.push({'Fecha':h.dateKey,'Nombre':p.name,'ID':p.id,'Poder':h.poder,'Méritos propios del día':h.meritos,'Méritos enemigos (no usados)':h.meritosEnemigos,'Muertes T4 del día':h.t4_muertas,'Muertes T5 del día':h.t5_muertas,'Curación T4 del día':h.t4_curadas,'Curación T5 del día':h.t5_curadas,'Muertes del día':num(h.t4_muertas)+num(h.t5_muertas),'Curación total del día':num(h.t4_curadas)+num(h.t5_curadas),'Construcción (s)':h.construccion,'Destrucción (s)':h.destruccion,'Infantería':h.infanteria,'Caballería':h.caballeria,'Arqueros':h.arqueros,'Magos':h.magos,'Otros méritos':h.otros,'Méritos acumulados':acumM,'Muertes acumuladas':acumD,'Construcción acumulada (s)':acumC,'Destrucción acumulada (s)':acumX});});
   const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Historial');XLSX.writeFile(wb,`REINO127_${p.name}_${p.id}.xlsx`);
 }
 function fillCompareSelects(){const s1=document.getElementById('compare1'), s2=document.getElementById('compare2');if(!s1)return;s1.innerHTML='';s2.innerHTML='';computed.forEach(p=>{s1.innerHTML+=`<option value="${p.id}">${p.name} [${p.id.slice(-6)}]</option>`;s2.innerHTML+=`<option value="${p.id}">${p.name} [${p.id.slice(-6)}]</option>`;});if(computed[1])s2.selectedIndex=1;}
 function openCompare(){fillCompareSelects();document.getElementById('compareOverlay').classList.add('active');}
 function closeCompare(){document.getElementById('compareOverlay').classList.remove('active');}
 function runCompare(){
-  const id1=document.getElementById('compare1').value, id2=document.getElementById('compare2').value;
+  const id1=document.getElementById('compare1').value,id2=document.getElementById('compare2').value;
   if(id1===id2){toast('Elige 2 diferentes','error');return;}
-  const p1=computed.find(c=>c.id===id1), p2=computed.find(c=>c.id===id2);
-  const h1=[...p1.history].sort((a,b)=>a.date-b.date), h2=[...p2.history].sort((a,b)=>a.date-b.date);
-  let acum1M=0,acum2M=0;let map1={},map2={};
-  h1.forEach((h,i)=>{let dM=i===0?h.meritos:h.meritos-h1[i-1].meritos;if(dM<0)dM=0;map1[h.fileName]={m:dM};acum1M+=dM;});
-  h2.forEach((h,i)=>{let dM=i===0?h.meritos:h.meritos-h2[i-1].meritos;if(dM<0)dM=0;map2[h.fileName]={m:dM};acum2M+=dM;});
-  let allFiles=[...new Set([...h1.map(x=>x.fileName),...h2.map(x=>x.fileName)])].sort();
-  let data1M=allFiles.map(f=>map1[f]?.m||0), data2M=allFiles.map(f=>map2[f]?.m||0);
-  document.getElementById('compareStats').innerHTML=`<div style="background:var(--card);border-radius:10px;padding:10px;text-align:center"><div style="font-weight:900;color:var(--accent)">${esc(p1.name)}</div><div style="font-size:9px;color:var(--muted)">${p1.id}</div><div style="font-size:11px;margin-top:4px">Méritos:${fmt(acum1M)}</div></div><div style="background:var(--card);border-radius:10px;padding:10px;text-align:center"><div style="font-weight:900;color:#64b4ff">${esc(p2.name)}</div><div style="font-size:9px;color:var(--muted)">${p2.id}</div><div style="font-size:11px;margin-top:4px">Méritos:${fmt(acum2M)}</div></div>`;
-  document.getElementById('compareWinner').textContent=acum1M>acum2M?`🏆 ${p1.name} gana`:`🏆 ${p2.name} gana`;
+  const p1=computed.find(c=>c.id===id1),p2=computed.find(c=>c.id===id2);if(!p1||!p2)return;
+  const h1=[...p1.history].sort((a,b)=>a.date-b.date),h2=[...p2.history].sort((a,b)=>a.date-b.date);
+  const sum=(h,k)=>h.reduce((a,x)=>a+num(x[k]),0);
+  const vals1={meritos:sum(h1,'meritos'),t4m:sum(h1,'t4_muertas'),t5m:sum(h1,'t5_muertas'),t4c:sum(h1,'t4_curadas'),t5c:sum(h1,'t5_curadas')};
+  const vals2={meritos:sum(h2,'meritos'),t4m:sum(h2,'t4_muertas'),t5m:sum(h2,'t5_muertas'),t4c:sum(h2,'t4_curadas'),t5c:sum(h2,'t5_curadas')};
+  const metrics=[['Méritos propios','meritos'],['Muertes T4','t4m'],['Muertes T5','t5m'],['Curación T4','t4c'],['Curación T5','t5c']];
+  document.getElementById('compareStats').innerHTML=`<div style="background:var(--card);border-radius:10px;padding:10px;text-align:center"><div style="font-weight:900;color:var(--accent)">${esc(p1.name)}</div><div style="font-size:9px;color:var(--muted)">${p1.id}</div></div><div style="background:var(--card);border-radius:10px;padding:10px;text-align:center"><div style="font-weight:900;color:var(--blue)">${esc(p2.name)}</div><div style="font-size:9px;color:var(--muted)">${p2.id}</div></div>`+`<div class="compare-metric-grid" style="grid-column:1/-1">${metrics.map(([label,k])=>`<div class="compare-metric"><div class="label">${label}</div><div class="values"><span class="p1">${fmt(vals1[k])}</span><span class="p2">${fmt(vals2[k])}</span></div></div>`).join('')}</div>`;
+  const scores={p1:0,p2:0};metrics.forEach(([_,k])=>{if(vals1[k]>vals2[k])scores.p1++;else if(vals2[k]>vals1[k])scores.p2++;});
+  document.getElementById('compareWinner').textContent=scores.p1===scores.p2?`⚔️ Empate ${scores.p1}-${scores.p2}`:scores.p1>scores.p2?`🏆 ${p1.name} gana ${scores.p1}-${scores.p2}`:`🏆 ${p2.name} gana ${scores.p2}-${scores.p1}`;
   Object.values(compareCharts).forEach(c=>{try{c.destroy();}catch(e){}});compareCharts={};document.getElementById('compareResult').classList.remove('hidden');
-  setTimeout(()=>{compareCharts.m=new Chart(document.getElementById('compareChartMeritos'),{type:'line',data:{labels:allFiles.map(f=>f.slice(0,12)),datasets:[{label:p1.name,data:data1M,borderColor:'#f5c518'},{label:p2.name,data:data2M,borderColor:'#64b4ff'}]},options:{responsive:true}});},150);
+  const allDates=[...new Set([...h1.map(x=>x.dateKey),...h2.map(x=>x.dateKey)])].sort();
+  const series=(h,key)=>{const m={};h.forEach(x=>m[x.dateKey]=num(x[key]));return allDates.map(d=>m[d]||0);};
+  setTimeout(()=>{compareCharts.m=new Chart(document.getElementById('compareChartMeritos'),{type:'line',data:{labels:allDates.map(d=>d.slice(5)),datasets:[{label:p1.name+' • Méritos',data:series(h1,'meritos')},{label:p2.name+' • Méritos',data:series(h2,'meritos')},{label:p1.name+' • Muertes T4',data:series(h1,'t4_muertas'),hidden:true},{label:p2.name+' • Muertes T4',data:series(h2,'t4_muertas'),hidden:true},{label:p1.name+' • Muertes T5',data:series(h1,'t5_muertas'),hidden:true},{label:p2.name+' • Muertes T5',data:series(h2,'t5_muertas'),hidden:true},{label:p1.name+' • Curación T4',data:series(h1,'t4_curadas'),hidden:true},{label:p2.name+' • Curación T4',data:series(h2,'t4_curadas'),hidden:true},{label:p1.name+' • Curación T5',data:series(h1,'t5_curadas'),hidden:true},{label:p2.name+' • Curación T5',data:series(h2,'t5_curadas'),hidden:true}]},options:{
+        responsive:true,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{display:false}}
+      }});},150);
 }
+
 function openConfig(){if(session.role!=='lider'){toast('Solo R5','error');return;}document.getElementById('cfgPoderMin').value=config.poderMin;document.getElementById('cfgUmbral').value=config.umbralNoAporta;document.getElementById('cfgPct').value=config.pctMinimo;document.getElementById('cfgGold').value=config.poderGold;document.getElementById('cfgDias').value=config.seFueDias;document.getElementById('configOverlay').classList.add('active');}
 function closeConfig(){document.getElementById('configOverlay').classList.remove('active');}
 document.getElementById('configOverlay').addEventListener('click',e=>{if(e.target.id==='configOverlay')closeConfig();});
