@@ -457,7 +457,7 @@ function safeSessionGet(key){try{return sessionStorage.getItem(key);}catch(e){re
 function safeSessionSet(key,value){try{sessionStorage.setItem(key,value);}catch(e){}}
 function safeSessionRemove(key){try{sessionStorage.removeItem(key);}catch(e){}}
 
-const PASS_MAP={miembro:'',oficial:'r4',lider:'lider'}; // R4: r4 | R5: lider
+const PASS_MAP={miembro:'',oficial:'0fficialr4',lider:'0fficialr5'}; // R4: 0fficialr4 | R5: 0fficialr5
 const CREDS={miembro:{level:1,label:'Miembro'},oficial:{level:2,label:'Oficial'},lider:{level:3,label:'Líder'}};
 const PER_PAGE=50;
 let session=null,allData={},fileParsed=[],playerNotes={},computed=[],currentPage=1,sortCol='rango',sortDir='asc',charts={},modalCharts={},compareCharts={},currentModalId=null,selectedRole=null;
