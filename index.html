@@ -334,6 +334,30 @@ function setRemoteStatus(msg,type='info'){
 
 .chart-controls{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:0 16px 12px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:12px}.chart-controls>div{display:flex;flex-direction:column;gap:4px;min-width:150px}.chart-controls label{font-size:8px;color:var(--muted);font-weight:800;text-transform:uppercase}.chart-controls input,.chart-controls select{min-width:150px}.period-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 16px 12px}.period-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}.period-card .label{font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase}.period-card .value{font-size:16px;font-weight:900;margin-top:4px}.alliance-chart-card{margin:0 16px 14px}.alliance-chart-wrap{height:520px}.compare-metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.compare-metric{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px;text-align:center}.compare-metric .label{font-size:8px;color:var(--muted)}.compare-metric .values{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px;font-size:11px;font-weight:800}.compare-metric .p1{color:var(--accent)}.compare-metric .p2{color:var(--blue)}
 @media(max-width:800px){.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.detail-total-box{grid-template-columns:1fr 1fr}}
+
+/* ============================================================
+   CONSULTA EXTERNA - COD TRACKER
+   Solo se muestra a R4/R5 mediante .oficial-only
+   ============================================================ */
+.cod-search-panel{margin:0 16px 12px;background:linear-gradient(145deg,rgba(21,26,48,.96),rgba(13,17,34,.96));border:1px solid var(--border);border-radius:12px;padding:11px 12px}
+.cod-search-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.cod-search-title{font-size:11px;font-weight:900;color:var(--blue);display:flex;align-items:center;gap:7px}
+.cod-search-source{font-size:8px;color:var(--muted)}
+.cod-search-row{display:grid;grid-template-columns:120px 1fr auto;gap:7px}
+.cod-search-row input,.cod-search-row select{width:100%;padding:9px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px;outline:none}
+.cod-search-row input:focus,.cod-search-row select:focus{border-color:var(--blue)}
+.cod-search-btn{padding:9px 14px;background:linear-gradient(135deg,#64b4ff,#3b82f6);border:0;border-radius:8px;color:#06101e;font-size:10px;font-weight:900;cursor:pointer}
+.cod-search-btn:disabled{opacity:.55;cursor:wait}
+.cod-result{margin-top:9px;display:none;background:rgba(5,10,24,.72);border:1px solid rgba(100,180,255,.18);border-radius:10px;padding:11px}
+.cod-result.show{display:block}
+.cod-result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}
+.cod-result-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px}
+.cod-result-label{font-size:7px;color:var(--muted);text-transform:uppercase;font-weight:800}
+.cod-result-value{font-size:11px;font-weight:900;margin-top:3px;overflow:hidden;text-overflow:ellipsis}
+.cod-result-name{font-size:15px;font-weight:900;color:var(--accent)}
+.cod-result-meta{font-size:9px;color:var(--muted);margin-top:2px}
+@media(max-width:700px){.cod-search-row{grid-template-columns:1fr 1fr}.cod-search-row input{grid-column:1/-1}.cod-search-btn{grid-column:1/-1}.cod-result-grid{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -400,6 +424,26 @@ function setRemoteStatus(msg,type='info'){
   <div class="upload-zone" id="uploadZone"><div style="color:var(--accent);font-weight:700"><i class="fas fa-cloud-arrow-up"></i> Arrastra tu ZIP aquí o click</div><div style="font-size:9px;color:var(--muted);margin-top:4px">R4/R5: los datos se guardan en Supabase para todo el reino</div><div id="fileInfo" style="margin-top:6px;color:var(--accent);font-size:10px;font-weight:700"></div><button id="syncBtn" class="btn-sm btn-export" style="margin:8px auto 0;display:inline-flex" onclick="syncCurrentData(event)"><i class="fas fa-cloud-arrow-up"></i> SINCRONIZAR CON SUPABASE</button><div id="memInfo" style="font-size:9px;color:var(--green);margin-top:4px"></div></div>
   <div id="viewOnlyMsg" class="hidden" style="margin:14px 16px;padding:10px;background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.2);border-radius:10px;font-size:11px;color:#64b4ff;text-align:center"><i class="fas fa-eye"></i> Modo Miembro: Solo lectura</div>
   <input type="file" id="fileInput" accept=".zip,.xlsx,.xls" multiple hidden>
+
+  <section class="cod-search-panel oficial-only" id="codTrackerPanel">
+    <div class="cod-search-head">
+      <div class="cod-search-title"><i class="fas fa-magnifying-glass"></i> Consulta de jugador</div>
+      <div class="cod-search-source">Fuente: COD Tracker</div>
+    </div>
+    <div class="cod-search-row">
+      <select id="codTrackerMode" aria-label="Tipo de búsqueda">
+        <option value="auto">Detectar</option>
+        <option value="id">ID</option>
+        <option value="name">Nombre</option>
+      </select>
+      <input id="codTrackerQuery" autocomplete="off" placeholder="ID o nombre del jugador..." aria-label="Jugador a buscar">
+      <button type="button" class="cod-search-btn" id="codTrackerSearchBtn" onclick="searchCodTrackerInHub()">
+        <i class="fas fa-search"></i> BUSCAR
+      </button>
+    </div>
+    <div id="codTrackerResult" class="cod-result"></div>
+  </section>
+
   <div class="files-panel oficial-only" id="filesPanel"><div class="files-header" onclick="toggleFilesPanel()"><div style="display:flex;align-items:center;gap:8px"><i class="fas fa-folder-open" style="color:var(--accent)"></i><span style="font-size:11px;font-weight:700">Archivos cargados</span><span id="fileCount" style="font-size:9px;color:var(--muted)">0</span></div><i class="fas fa-chevron-down" id="filesChevron" style="font-size:10px;color:var(--muted)"></i></div><div class="files-list" id="filesList"></div></div>
   <div class="stats-grid"><div class="stat-card"><div class="stat-label">Jugadores 20M+</div><div class="stat-value" id="sJ">—</div></div><div class="stat-card"><div class="stat-label">Poder Máx. Histórico Total</div><div class="stat-value" id="sP">—</div></div><div class="stat-card"><div class="stat-label">Muertes</div><div class="stat-value" style="color:var(--red)" id="sD">—</div></div><div class="stat-card"><div class="stat-label">Mérito Prom</div><div class="stat-value" style="color:var(--accent)" id="sMP">—</div></div><div class="stat-card"><div class="stat-label">Méritos Total</div><div class="stat-value" id="sMT">—</div></div><div class="stat-card"><div class="stat-label">Construcción</div><div class="stat-value" style="color:var(--blue)" id="sC">—</div></div><div class="stat-card"><div class="stat-label">Destrucción</div><div class="stat-value" style="color:var(--red)" id="sX">—</div></div></div>
   <nav class="tabs-bar"><button class="tab-btn active" data-tab="jugadores" onclick="switchTab('jugadores')"><i class="fas fa-users"></i> Jugadores <span id="cAll">0</span></button><button class="tab-btn" data-tab="graficos" onclick="switchTab('graficos')"><i class="fas fa-chart-bar"></i> Gráficos</button><button class="tab-btn" data-tab="noaportan" onclick="switchTab('noaportan')"><i class="fas fa-circle-xmark"></i> No Aportan <span id="cNA">0</span></button><button class="tab-btn" data-tab="sefueron" onclick="switchTab('sefueron')"><i class="fas fa-door-open"></i> Se Fueron <span id="cSF">0</span></button></nav>
@@ -1151,6 +1195,79 @@ document.addEventListener('keydown', e => {
     document.getElementById('searchInput').select();
   }
 });
+
+// ============================================================
+// CONSULTA COD TRACKER DESDE REINO 127
+// El navegador solo llama a nuestra Netlify Function.
+// Nunca se expone aquí ningún token de COD Tracker.
+// ============================================================
+function codTrackerFormat(n){
+  const v=Number(n);
+  if(!Number.isFinite(v)) return '—';
+  return v.toLocaleString('en-US');
+}
+function codTrackerEsc(v){return esc(v==null?'—':v);}
+function renderCodTrackerResult(p){
+  const box=document.getElementById('codTrackerResult');
+  if(!box)return;
+  if(!p){
+    box.innerHTML='<div style="color:var(--red);font-size:10px;font-weight:700">No se encontró el jugador.</div>';
+    box.classList.add('show');
+    return;
+  }
+  box.innerHTML=`
+    <div class="cod-result-name">${codTrackerEsc(p.name||'Jugador sin nombre')}</div>
+    <div class="cod-result-meta">ID ${codTrackerEsc(p.id||'—')} · Reino S${codTrackerEsc(p.server||p.reino||'—')} · ${codTrackerEsc(p.alliance||'Sin alianza')}</div>
+    <div class="cod-result-grid">
+      <div class="cod-result-item"><div class="cod-result-label">Poder</div><div class="cod-result-value">${codTrackerFormat(p.power)}</div></div>
+      <div class="cod-result-item"><div class="cod-result-label">Poder máximo</div><div class="cod-result-value">${codTrackerFormat(p.powerMax)}</div></div>
+      <div class="cod-result-item"><div class="cod-result-label">Méritos</div><div class="cod-result-value">${codTrackerFormat(p.merit)}</div></div>
+      <div class="cod-result-item"><div class="cod-result-label">Muertes</div><div class="cod-result-value">${codTrackerFormat(p.dead)}</div></div>
+      <div class="cod-result-item"><div class="cod-result-label">Curación</div><div class="cod-result-value">${codTrackerFormat(p.heal)}</div></div>
+      <div class="cod-result-item"><div class="cod-result-label">Kills</div><div class="cod-result-value">${codTrackerFormat(p.kill)}</div></div>
+      <div class="cod-result-item"><div class="cod-result-label">Victorias</div><div class="cod-result-value">${codTrackerFormat(p.victory)}</div></div>
+      <div class="cod-result-item"><div class="cod-result-label">Derrotas</div><div class="cod-result-value">${codTrackerFormat(p.failure)}</div></div>
+    </div>
+    <div style="margin-top:8px;font-size:8px;color:var(--muted)">Datos recibidos mediante REINO 127 HUB · Fuente: COD Tracker</div>`;
+  box.classList.add('show');
+}
+async function searchCodTrackerInHub(){
+  if(!session || Number(session.level||0)<2){
+    toast('Solo R4 y R5 pueden usar esta consulta','error');return;
+  }
+  const input=document.getElementById('codTrackerQuery');
+  const mode=document.getElementById('codTrackerMode');
+  const btn=document.getElementById('codTrackerSearchBtn');
+  const box=document.getElementById('codTrackerResult');
+  const q=String(input?.value||'').trim();
+  if(!q){toast('Escribe un ID o nombre','error');input?.focus();return;}
+  if(mode?.value==='id' && !/^\d+$/.test(q)){
+    toast('El modo ID solo acepta números','error');return;
+  }
+  if(mode?.value==='auto' && /^\d+$/.test(q)===false && q.length<2){
+    toast('Escribe al menos 2 caracteres','error');return;
+  }
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> BUSCANDO...';}
+  if(box){box.classList.add('show');box.innerHTML='<div style="font-size:10px;color:var(--muted)">Consultando fuente…</div>';}
+  try{
+    const url='/.netlify/functions/codtracker?q='+encodeURIComponent(q)+'&mode='+encodeURIComponent(mode?.value||'auto');
+    const r=await fetch(url,{headers:{'Accept':'application/json'}});
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok || !data.ok) throw new Error(data.error||('HTTP '+r.status));
+    renderCodTrackerResult(data.player);
+    if(data.player) toast('Jugador encontrado','success');
+  }catch(e){
+    console.error('COD TRACKER HUB',e);
+    if(box){box.innerHTML='<div style="color:var(--red);font-size:10px;font-weight:700">No se pudo completar la consulta.</div><div style="font-size:9px;color:var(--muted);margin-top:4px">'+codTrackerEsc(e.message)+'</div>';}
+    toast('Error consultando COD Tracker','error');
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-search"></i> BUSCAR';}
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && document.activeElement?.id==='codTrackerQuery') searchCodTrackerInHub();
+});
+
 </script>
 </body>
 </html>
