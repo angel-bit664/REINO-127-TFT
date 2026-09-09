@@ -194,7 +194,9 @@ export default async ({ page, context }) => {
     clickCount: 3
   });
 
-  await input.press("Control+A");
+  await page.keyboard.down("Control");
+  await page.keyboard.press("A");
+  await page.keyboard.up("Control");
 
   await input.type(q, {
     delay: 40
