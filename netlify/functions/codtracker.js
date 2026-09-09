@@ -1,6 +1,6 @@
 // ============================================================
-// REINO 127 - COD TRACKER BRIDGE
-// Primera prueba con Browserless
+// REINO 127 - COD TRACKER + BROWSERLESS
+// Prueba 2: interactuar con el buscador de COD Tracker
 // ============================================================
 
 exports.handler = async (event) => {
@@ -12,9 +12,6 @@ exports.handler = async (event) => {
     "Access-Control-Allow-Methods": "GET, OPTIONS"
   };
 
-  // ----------------------------------------------------------
-  // CORS preflight
-  // ----------------------------------------------------------
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 204,
@@ -23,9 +20,6 @@ exports.handler = async (event) => {
     };
   }
 
-  // ----------------------------------------------------------
-  // Browserless token
-  // ----------------------------------------------------------
   const token = process.env.BROWSERLESS_TOKEN;
 
   if (!token) {
@@ -34,14 +28,11 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({
         ok: false,
-        error: "BROWSERLESS_TOKEN no está configurado en Netlify."
+        error: "BROWSERLESS_TOKEN no está configurado."
       })
     };
   }
 
-  // ----------------------------------------------------------
-  // Parámetros
-  // ----------------------------------------------------------
   const params = event.queryStringParameters || {};
 
   const query = String(params.q || "").trim();
@@ -58,174 +49,401 @@ exports.handler = async (event) => {
     };
   }
 
-  // Evitar consultas excesivamente largas
   if (query.length > 100) {
     return {
       statusCode: 400,
       headers,
       body: JSON.stringify({
         ok: false,
-        error: "La búsqueda es demasiado larga."
+        error: "Consulta demasiado larga."
       })
     };
   }
 
-  // ----------------------------------------------------------
-  // Código que Browserless ejecutará dentro de Chrome
-  // ----------------------------------------------------------
+  // ==========================================================
+  // Código que ejecutará Browserless dentro de Chrome
+  // ==========================================================
+
   const browserCode = `
 export default async ({ page, context }) => {
 
   const q = context.query;
 
-  const target =
-    "https://cod-tracker.com/lord?q=" +
-    encodeURIComponent(q);
+  const clean = (value) => {
+    if (!value) return "";
 
-  let navigationError = null;
+    return String(value)
+      .replace(/\\\\u00a0/g, " ")
+      .replace(/\\\\s+/g, " ")
+      .trim();
+  };
 
-  try {
-    await page.goto(target, {
+  // ----------------------------------------------------------
+  // 1. Abrir la página pública de búsqueda
+  // ----------------------------------------------------------
+
+  await page.goto(
+    "https://cod-tracker.com/lord",
+    {
       waitUntil: "networkidle2",
       timeout: 30000
-    });
-  } catch (err) {
-    navigationError = err && err.message
-      ? err.message
-      : String(err);
+    }
+  );
+
+  await new Promise(resolve => setTimeout(resolve, 3000));
+
+  // ----------------------------------------------------------
+  // 2. Inspeccionar los campos disponibles
+  // ----------------------------------------------------------
+
+  const inputsBefore = await page.evaluate(() => {
+
+    return Array.from(
+      document.querySelectorAll("input")
+    ).map((input, index) => ({
+      index,
+      type: input.type || "",
+      name: input.name || "",
+      id: input.id || "",
+      placeholder: input.placeholder || "",
+      aria: input.getAttribute("aria-label") || "",
+      value: input.value || ""
+    }));
+
+  });
+
+  // ----------------------------------------------------------
+  // 3. Buscar el input adecuado
+  // ----------------------------------------------------------
+
+  const inputHandle = await page.evaluateHandle(() => {
+
+    const inputs = Array.from(
+      document.querySelectorAll("input")
+    );
+
+    const score = (input) => {
+
+      const text = [
+        input.type,
+        input.name,
+        input.id,
+        input.placeholder,
+        input.getAttribute("aria-label")
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      let points = 0;
+
+      if (
+        input.type === "search"
+      ) points += 10;
+
+      if (
+        text.includes("search") ||
+        text.includes("buscar") ||
+        text.includes("name") ||
+        text.includes("lord") ||
+        text.includes("id")
+      ) {
+        points += 5;
+      }
+
+      if (
+        input.placeholder
+      ) {
+        points += 2;
+      }
+
+      return points;
+    };
+
+    inputs.sort(
+      (a, b) => score(b) - score(a)
+    );
+
+    return inputs[0] || null;
+
+  });
+
+  const input = inputHandle.asElement();
+
+  if (!input) {
+
+    return {
+      data: {
+        ok: false,
+        stage: "find-input",
+        query: q,
+        inputsBefore,
+        bodyText: document.body
+          ? document.body.innerText || ""
+          : ""
+      },
+      type: "application/json"
+    };
+
   }
 
-  // Dar tiempo a que COD Tracker termine de ejecutar
-  // su JavaScript y renderizar los resultados.
+  // ----------------------------------------------------------
+  // 4. Escribir la consulta
+  // ----------------------------------------------------------
+
+  await input.click({
+    clickCount: 3
+  });
+
+  await input.press("Control+A");
+
+  await input.type(q, {
+    delay: 40
+  });
+
+  // ----------------------------------------------------------
+  // 5. Intentar enviar mediante Enter
+  // ----------------------------------------------------------
+
+  await input.press("Enter");
+
+  // ----------------------------------------------------------
+  // 6. Esperar que COD Tracker procese la búsqueda
+  // ----------------------------------------------------------
+
   await new Promise(resolve => setTimeout(resolve, 5000));
+
+  // ----------------------------------------------------------
+  // 7. Si Enter no produjo navegación/cambio,
+  //    buscar botones relacionados
+  // ----------------------------------------------------------
+
+  const afterEnter = await page.evaluate(() => ({
+    url: location.href,
+    bodyText: document.body
+      ? document.body.innerText || ""
+      : ""
+  }));
+
+  const stillLooksLikeSearchPage =
+    !afterEnter.bodyText ||
+    afterEnter.bodyText.length < 300;
+
+  if (stillLooksLikeSearchPage) {
+
+    const buttons = await page.$$("button");
+
+    for (const button of buttons) {
+
+      const info = await button.evaluate(btn => ({
+        text: btn.innerText || "",
+        aria: btn.getAttribute("aria-label") || "",
+        title: btn.getAttribute("title") || ""
+      }));
+
+      const buttonText = (
+        info.text + " " +
+        info.aria + " " +
+        info.title
+      ).toLowerCase();
+
+      if (
+        buttonText.includes("search") ||
+        buttonText.includes("buscar") ||
+        buttonText.includes("find") ||
+        buttonText.includes("tìm")
+      ) {
+
+        try {
+          await button.click();
+          await new Promise(
+            resolve => setTimeout(resolve, 5000)
+          );
+        } catch (e) {}
+
+        break;
+      }
+    }
+  }
+
+  // ----------------------------------------------------------
+  // 8. Extraer el resultado final
+  // ----------------------------------------------------------
 
   const result = await page.evaluate(() => {
 
     const clean = (value) => {
+
       if (!value) return "";
+
       return String(value)
         .replace(/\\\\u00a0/g, " ")
         .replace(/\\\\s+/g, " ")
         .trim();
+
     };
 
     const bodyText = document.body
       ? document.body.innerText || ""
       : "";
 
-    const title = document.title || "";
+    const headings = Array.from(
+      document.querySelectorAll(
+        "h1,h2,h3,h4,h5"
+      )
+    ).map(
+      el => clean(el.innerText)
+    );
 
-    const tables = Array.from(
-      document.querySelectorAll("table")
-    ).map((table) => {
+    const inputs = Array.from(
+      document.querySelectorAll("input")
+    ).map(
+      (input, index) => ({
+        index,
+        type: input.type || "",
+        name: input.name || "",
+        id: input.id || "",
+        placeholder: input.placeholder || "",
+        value: input.value || ""
+      })
+    );
 
-      const rows = Array.from(
-        table.querySelectorAll("tr")
-      ).map((row) => {
-
-        return Array.from(
-          row.querySelectorAll("th, td")
-        ).map(cell => clean(cell.innerText));
-
-      });
-
-      return rows;
-    });
+    const buttons = Array.from(
+      document.querySelectorAll("button")
+    ).map(
+      (button, index) => ({
+        index,
+        text: clean(button.innerText),
+        aria:
+          button.getAttribute("aria-label") || "",
+        title:
+          button.getAttribute("title") || ""
+      })
+    );
 
     const links = Array.from(
       document.querySelectorAll("a[href]")
     )
-      .slice(0, 100)
-      .map(a => ({
-        text: clean(a.innerText),
-        href: a.href
-      }));
+      .slice(0, 150)
+      .map(
+        a => ({
+          text: clean(a.innerText),
+          href: a.href
+        })
+      );
 
-    const headings = Array.from(
-      document.querySelectorAll("h1, h2, h3, h4")
-    ).map(h => clean(h.innerText));
+    const tables = Array.from(
+      document.querySelectorAll("table")
+    ).map(table =>
+      Array.from(
+        table.querySelectorAll("tr")
+      ).map(row =>
+        Array.from(
+          row.querySelectorAll("th,td")
+        ).map(
+          cell => clean(cell.innerText)
+        )
+      )
+    );
 
     return {
-      title,
       url: location.href,
+      title: document.title || "",
       bodyText,
       headings,
-      tables,
-      links
+      inputs,
+      buttons,
+      links,
+      tables
     };
+
   });
 
   return {
     data: {
+      ok: true,
       query: q,
-      target,
-      navigationError,
-      ...result
+      target:
+        "https://cod-tracker.com/lord",
+      inputsBefore,
+      result
     },
     type: "application/json"
   };
+
 };
 `;
 
-  // ----------------------------------------------------------
-  // Llamada a Browserless
-  // ----------------------------------------------------------
+  // ==========================================================
+  // Browserless
+  // ==========================================================
+
   const browserlessUrl =
     "https://production-sfo.browserless.io/function?token=" +
     encodeURIComponent(token);
 
   try {
 
-    const response = await fetch(browserlessUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        code: browserCode,
-        context: {
-          query
-        }
-      })
-    });
+    const response = await fetch(
+      browserlessUrl,
+      {
+        method: "POST",
 
-    const responseText = await response.text();
+        headers: {
+          "Content-Type": "application/json"
+        },
 
-    let browserlessData;
+        body: JSON.stringify({
+          code: browserCode,
+
+          context: {
+            query
+          }
+        })
+      }
+    );
+
+    const responseText =
+      await response.text();
+
+    let data;
 
     try {
-      browserlessData = JSON.parse(responseText);
+      data = JSON.parse(responseText);
     } catch {
-      browserlessData = {
+      data = {
         raw: responseText
       };
     }
 
     if (!response.ok) {
+
       return {
         statusCode: 502,
         headers,
+
         body: JSON.stringify({
           ok: false,
-          error: "Browserless devolvió un error.",
-          browserlessStatus: response.status,
-          browserless: browserlessData
+          error:
+            "Browserless devolvió un error.",
+          browserlessStatus:
+            response.status,
+          browserless: data
         })
       };
+
     }
 
-    // --------------------------------------------------------
-    // Devolvemos los datos de la prueba a REINO 127
-    // --------------------------------------------------------
     return {
       statusCode: 200,
       headers,
+
       body: JSON.stringify({
         ok: true,
         source: "COD Tracker",
         mode,
         query,
-        result: browserlessData.data || browserlessData
+        result:
+          data.data || data
       })
     };
 
@@ -234,13 +452,18 @@ export default async ({ page, context }) => {
     return {
       statusCode: 500,
       headers,
+
       body: JSON.stringify({
         ok: false,
-        error: "Error comunicando con Browserless.",
-        details: error && error.message
-          ? error.message
-          : String(error)
+        error:
+          "Error comunicando con Browserless.",
+        details:
+          error && error.message
+            ? error.message
+            : String(error)
       })
     };
+
   }
+
 };
