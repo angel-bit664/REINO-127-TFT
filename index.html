@@ -456,7 +456,7 @@ function setRemoteStatus(msg,type='info'){
       <button class="btn-sm btn-discord oficial-only" onclick="copyInactivos()"><i class="fab fa-discord"></i> Inactivos</button>
       <button class="btn-sm btn-export oficial-only" onclick="exportFullReport()"><i class="fas fa-file-excel"></i> Exportar</button>
       <button class="btn-sm btn-settings lider-only" onclick="openConfig()"><i class="fas fa-gear"></i></button>
-      <button class="btn-sm btn-danger lider-only" onclick="clearMemory()"><i class="fas fa-trash"></i> Limpiar</button>
+      <button class="btn-sm btn-danger lider-only" onclick="clearMemory()"><i class="fas fa-trash"></i> BORRAR TODO</button>
     </div>
     <div class="table-container"><div class="table-scroll"><table><thead><tr><th data-col="rango">#</th><th data-col="name">Jugador</th><th data-col="id">ID</th><th data-col="poder">Poder máximo histórico</th><th data-col="meritos">Méritos propios</th><th data-col="muertesT4">Muertes T4</th><th data-col="muertesT5">Muertes T5</th><th data-col="curadasT4">Curación T4</th><th data-col="curadasT5">Curación T5</th><th>Estado</th></tr></thead><tbody id="tBody"></tbody></table></div><div class="pagination" id="pagination"></div></div>
   </section>
@@ -637,11 +637,73 @@ async function loadFromStorage(){
   return false;
 }
 async function clearMemory(){
-  if(session.role!=='lider'){toast('Solo R5','error');return;}
-  if(!confirm('¿Borrar TODO de IndexedDB?'))return;
-  indexedDB.deleteDatabase(DB_NAME);
-  localStorage.clear();
-  location.reload();
+  if(!session || session.role!=='lider' || Number(session.level)<3){
+    toast('Solo R5 puede borrar la temporada.','error');
+    return;
+  }
+  const ok=confirm('⚠️ BORRAR TEMPORADA COMPLETA\n\nSe eliminarán de Supabase todos los registros de estadisticas_diarias y jugadores para todo el Reino 127. Esta acción no se puede deshacer.\n\n¿Deseas continuar?');
+  if(!ok)return;
+
+  const password=prompt('Introduce la contraseña de borrado configurada en Supabase (R127_DELETE_PASSWORD):');
+  if(password===null)return;
+  if(!password.trim()){
+    toast('Debes introducir la contraseña de borrado.','error');
+    return;
+  }
+
+  const btn=document.querySelector('.btn-danger.lider-only');
+  if(btn){btn.disabled=true;btn.style.opacity='.6';}
+  setRemoteStatus('⏳ Solicitando borrado seguro a Supabase…');
+
+  try{
+    if(!supabaseReady()) throw new Error('Supabase no está configurado.');
+
+    const response=await fetch(SUPABASE_URL+'/functions/v1/r127-season-admin',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_ANON_KEY,
+        'Authorization':'Bearer '+SUPABASE_ANON_KEY
+      },
+      body:JSON.stringify({action:'delete-season',password:password})
+    });
+
+    let result={};
+    try{result=await response.json();}catch(e){}
+    if(!response.ok || result.ok!==true){
+      throw new Error(result.error || ('La función respondió HTTP '+response.status+'. Revisa los logs de Edge Functions.'));
+    }
+
+    // Solo se borra la copia local después de confirmar que el servidor terminó.
+    try{
+      if(dbInstance){dbInstance.close();dbInstance=null;}
+      await new Promise((resolve,reject)=>{
+        const request=indexedDB.deleteDatabase(DB_NAME);
+        request.onsuccess=()=>resolve();
+        request.onerror=()=>reject(request.error||new Error('No se pudo borrar la memoria local.'));
+        request.onblocked=()=>reject(new Error('La base local está abierta en otra pestaña. Cierra otras pestañas del HUB e inténtalo de nuevo.'));
+      });
+    }catch(localError){
+      console.warn('Borrado remoto completado, pero la limpieza local falló:',localError);
+      toast('Supabase se borró correctamente, pero cierra otras pestañas y recarga para limpiar la copia local.','error');
+      setRemoteStatus('☁️ Temporada borrada en Supabase; falta limpiar la copia local.','error');
+      return;
+    }
+
+    allData={};
+    fileParsed=[];
+    playerNotes={};
+    safeSessionRemove('r127_session');
+    toast(result.message||'Temporada borrada correctamente en Supabase.','success');
+    setRemoteStatus('☁️ Temporada borrada y verificada en Supabase.','success');
+    setTimeout(()=>location.reload(),900);
+  }catch(error){
+    console.error('Error al borrar temporada:',error);
+    toast('No se pudo borrar la temporada: '+(error.message||'error desconocido'),'error');
+    setRemoteStatus('❌ No se completó el borrado. Revisa la función y sus logs.','error');
+  }finally{
+    if(btn){btn.disabled=false;btn.style.opacity='';}
+  }
 }
 let filesOpen=false;
 function toggleFilesPanel(){filesOpen=!filesOpen;document.getElementById('filesList').classList.toggle('open',filesOpen);}
