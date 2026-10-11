@@ -550,6 +550,25 @@ async function saveToStorage(){
     document.getElementById('memInfo').textContent=`📦 IndexedDB OK: ${fileParsed.length} archivos - ${(size/1024/1024).toFixed(2)}MB`;
   }catch(e){toast('Error guardando: '+e.message,'error');}
 }
+function resetDashboardView(){
+  computed=[];
+  const zeroIds=['sJ','sP','sD','sMP','sMT','sC','sX','cAll','cNA','cSF'];
+  zeroIds.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
+  const body=document.getElementById('tBody');if(body)body.innerHTML='';
+  const pagination=document.getElementById('pagination');if(pagination)pagination.innerHTML='';
+  const summary=document.getElementById('periodSummary');if(summary)summary.innerHTML='';
+  const count=document.getElementById('fileCount');if(count)count.textContent='0 archivos';
+  const list=document.getElementById('filesList');if(list)list.innerHTML='<div style="padding:14px;text-align:center;color:var(--muted);font-size:10px">Sin archivos</div>';
+  const info=document.getElementById('fileInfo');if(info)info.textContent='';
+  const compareResult=document.getElementById('compareResult');if(compareResult)compareResult.classList.add('hidden');
+  const compareStats=document.getElementById('compareStats');if(compareStats)compareStats.innerHTML='';
+  const compareWinner=document.getElementById('compareWinner');if(compareWinner)compareWinner.textContent='';
+  const selects=['compare1','compare2'];selects.forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
+  Object.values(charts).forEach(chart=>{try{chart.destroy();}catch(e){}});charts={};
+  Object.values(modalCharts).forEach(chart=>{try{chart.destroy();}catch(e){}});modalCharts={};
+  Object.values(compareCharts).forEach(chart=>{try{chart.destroy();}catch(e){}});compareCharts={};
+}
+
 async function loadFromStorage(){
   // 1) Supabase = fuente compartida para todos los dispositivos.
   if(supabaseReady()){
@@ -558,6 +577,20 @@ async function loadFromStorage(){
         sbGetAll('jugadores','*','id'),
         sbGetAll('estadisticas_diarias','*','fecha')
       ]);
+      // Supabase es la fuente de verdad: si está vacía, NO recuperar una copia local antigua.
+      if(Array.isArray(stats) && stats.length===0){
+        allData={};
+        fileParsed=[];
+        playerNotes={};
+        try{
+          await idbSet('allData',{});
+          await idbSet('fileParsed',[]);
+          await idbSet('playerNotes',{});
+        }catch(localClearError){console.warn('No se pudo limpiar la copia local:',localClearError);}
+        resetDashboardView();
+        setRemoteStatus('☁️ Supabase está vacío • listo para cargar una temporada nueva','success');
+        return true;
+      }
       if(Array.isArray(stats) && stats.length){
         allData={}; fileParsed=[];
         const pmap={};
@@ -607,14 +640,20 @@ async function loadFromStorage(){
         return true;
       }
     }catch(e){
+      // Si Supabase falla, no mostrar datos locales viejos como si fueran actuales.
       console.warn('Supabase no disponible:',e);
-      setRemoteStatus('⚠️ Supabase no disponible • usando memoria local','error');
+      allData={};
+      fileParsed=[];
+      resetDashboardView();
+      setRemoteStatus('❌ No se pudo leer Supabase • no se cargaron datos locales para evitar mezclar temporadas','error');
+      toast('No se pudo conectar con Supabase. Se omitieron datos locales antiguos.','error');
+      return false;
     }
   }else{
     setRemoteStatus('⚠️ Falta la Publishable/anon key de Supabase');
   }
 
-  // 2) Fallback local.
+  // 2) Fallback local solo cuando Supabase no está configurado.
   try{
     const d=await idbGet('allData');
     const f=await idbGet('fileParsed');
@@ -1026,7 +1065,7 @@ function parseExcel(buf,name){
 }
 // FIX SE FUERON - AHORA REVISA SI ESTA EN EL ULTIMO ARCHIVO
 function analyze(isLoad=false){
-  if(!Object.keys(allData).length)return;
+  if(!Object.keys(allData).length){resetDashboardView();return;}
   fileParsed.sort((a,b)=>a.date-b.date);
   const latestDateKey=fileParsed[fileParsed.length-1]?.dateKey;
   computed=[];let tP=0,tM=0,tD=0,tC=0,tX=0;
