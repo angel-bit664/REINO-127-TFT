@@ -314,7 +314,7 @@ function setRemoteStatus(msg,type='info'){
 .toolbar{display:flex;gap:6px;margin:0 16px 10px;flex-wrap:wrap}.search-wrap{position:relative;flex:1;min-width:200px}.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:11px}.search-input{width:100%;padding:8px 10px 8px 28px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px;outline:none}.search-input:focus{border-color:var(--accent)}.filter-sel{padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:11px}
 .btn-sm{padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}.btn-vs{background:rgba(245,197,24,.15);border-color:rgba(245,197,24,.3);color:#f5c518}.btn-discord{background:rgba(88,101,242,.15);border-color:rgba(88,101,242,.3);color:#949cf7}.btn-danger{color:var(--red)}.btn-export{background:rgba(0,255,136,.12);border-color:rgba(0,255,136,.3);color:var(--green)}.btn-settings{background:var(--blue-d);border-color:rgba(100,180,255,.3);color:var(--blue)}
 .table-container{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:0 16px 14px}.table-scroll{overflow:auto;max-height:58vh}table{width:100%;border-collapse:collapse;font-size:11px}th{background:var(--card);padding:9px 10px;text-align:left;color:var(--muted);font-size:8px;font-weight:700;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer}td{padding:8px 10px;border-top:1px solid rgba(30,35,64,.4);white-space:nowrap}tbody tr:hover{background:rgba(26,32,64,.6);cursor:pointer}
-.badge{padding:2px 8px;border-radius:10px;font-size:9px;font-weight:800;display:inline-block}.b-pelea{background:var(--green-d);color:var(--green)}.b-noaporta{background:var(--red-d);color:var(--red)}.b-nuevo{background:var(--yellow-d);color:var(--yellow)}.b-sefue{background:rgba(140,140,140,.12);color:#aaa}
+.badge{padding:2px 8px;border-radius:10px;font-size:9px;font-weight:800;display:inline-block}.b-pelea{background:var(--green-d);color:var(--green)}.b-noaporta{background:var(--red-d);color:var(--red)}.b-nuevo{background:var(--yellow-d);color:var(--yellow)}.b-sefue{background:rgba(140,140,140,.12);color:#aaa}.b-revisar{background:rgba(245,197,24,.13);color:#f5c518}
 .poder-gold{color:var(--accent)!important;font-weight:900!important}
 .note-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);display:inline-block;margin-left:4px;box-shadow:0 0 6px rgba(100,180,255,.6)}
 .pagination{display:flex;justify-content:center;gap:4px;padding:10px;border-top:1px solid var(--border)}.pg-btn{width:28px;height:28px;display:grid;place-items:center;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer}.pg-btn.active{background:var(--accent-d);color:var(--accent)}
@@ -450,12 +450,12 @@ function setRemoteStatus(msg,type='info'){
   <section id="view-jugadores">
     <div class="toolbar">
       <div class="search-wrap"><i class="fas fa-magnifying-glass"></i><input class="search-input" id="searchInput" placeholder="Buscar por nombre o ID... (Ctrl+K)"></div>
-      <select class="filter-sel" id="filterEstado"><option value="all">Todos</option><option value="PELEA">Pelean</option><option value="NO APORTA">No aportan</option><option value="NUEVO">Nuevos</option><option value="SE FUE">Se fueron</option></select>
+      <select class="filter-sel" id="filterEstado"><option value="all">Todos</option><option value="PELEA">Pelean</option><option value="NO APORTA">No aportan</option><option value="NUEVO">Nuevos</option><option value="REVISAR">Revisar</option><option value="SE FUE">Se fueron</option></select>
       <select class="filter-sel" id="filterNota"><option value="all">Con/sin nota</option><option value="con">Con nota</option><option value="sin">Sin nota</option></select>
       <button class="btn-sm btn-vs" onclick="openCompare()"><i class="fas fa-code-compare"></i> VS</button>
       <button class="btn-sm btn-discord oficial-only" onclick="copyInactivos()"><i class="fab fa-discord"></i> Inactivos</button>
       <button class="btn-sm btn-export oficial-only" onclick="exportFullReport()"><i class="fas fa-file-excel"></i> Exportar</button>
-      <button class="btn-sm btn-settings lider-only" onclick="openConfig()"><i class="fas fa-gear"></i></button>
+      <button class="btn-sm btn-settings oficial-only" onclick="openConfig()"><i class="fas fa-gear"></i></button>
       <button class="btn-sm btn-danger lider-only" onclick="clearMemory()"><i class="fas fa-trash"></i> BORRAR TODO</button>
     </div>
     <div class="table-container"><div class="table-scroll"><table><thead><tr><th data-col="rango">#</th><th data-col="name">Jugador</th><th data-col="id">ID</th><th data-col="poder">Poder máximo histórico</th><th data-col="meritos">Méritos propios</th><th data-col="muertesT4">Muertes T4</th><th data-col="muertesT5">Muertes T5</th><th data-col="curadasT4">Curación T4</th><th data-col="curadasT5">Curación T5</th><th>Estado</th></tr></thead><tbody id="tBody"></tbody></table></div><div class="pagination" id="pagination"></div></div>
@@ -492,11 +492,32 @@ function setRemoteStatus(msg,type='info'){
   <div style="font-size:9px;color:var(--muted);margin:-4px 0 8px">El detalle superior compara también muertes T4/T5 y curación T4/T5.</div>
   <canvas id="compareChartMeritos" height="180"></canvas>
 </div><div id="compareWinner" style="padding:12px;border-radius:10px;text-align:center;font-weight:900;margin-top:10px"></div></div></div></div>
-  <div class="modal-overlay" id="configOverlay"><div class="modal-content" style="max-width:500px"><div style="display:flex;justify-content:space-between;margin-bottom:16px"><div style="font-weight:900;color:var(--accent)"><i class="fas fa-gear"></i> CONFIG</div><button onclick="closeConfig()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div><div class="config-row"><div class="config-label">Poder mínimo</div><input type="number" class="config-input" id="cfgPoderMin"></div><div class="config-row"><div class="config-label">Umbral No Aporta</div><input type="number" class="config-input" id="cfgUmbral"></div><div class="config-row"><div class="config-label">% mínimo</div><input type="number" class="config-input" id="cfgPct" step="0.1"></div><div class="config-row"><div class="config-label">Poder dorado</div><input type="number" class="config-input" id="cfgGold"></div><div class="config-row"><div class="config-label">Días para Se fue</div><input type="number" class="config-input" id="cfgDias"></div><button onclick="saveConfig()" style="width:100%;margin-top:14px;padding:11px;background:linear-gradient(135deg,#64b4ff,#3b82f6);border:none;border-radius:10px;color:#000;font-weight:900;cursor:pointer"><i class="fas fa-save"></i> GUARDAR</button></div></div>
+  <div class="modal-overlay" id="configOverlay"><div class="modal-content" style="max-width:760px;max-height:88vh;overflow-y:auto"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-weight:900;color:var(--accent);font-size:16px"><i class="fas fa-gear"></i> CONFIG — EVALUACIÓN KVK</div><button onclick="closeConfig()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Las metas se evalúan sobre los días únicos de archivos cargados. Un valor mínimo de 0 desactiva ese criterio. Méritos enemigos no se incluyen.</div>
+  <div style="font-weight:800;color:var(--accent);margin:12px 0 6px">Filtros generales</div>
+  <div class="config-row"><div class="config-label">Poder mínimo</div><input type="number" min="0" class="config-input" id="cfgPoderMin"></div>
+  <div class="config-row"><div class="config-label">Poder dorado</div><input type="number" min="0" class="config-input" id="cfgGold"></div>
+  <div class="config-row"><div class="config-label">Días para Se fue</div><input type="number" min="1" class="config-input" id="cfgDias"></div>
+  <div style="font-weight:800;color:var(--accent);margin:16px 0 6px">Metas mínimas de actividad (suma del periodo cargado)</div>
+  <div class="config-row"><div class="config-label">Méritos propios</div><input type="number" min="0" class="config-input" id="cfgUmbral"></div>
+  <div class="config-row"><div class="config-label">Muertes T4</div><input type="number" min="0" class="config-input" id="cfgMuertesT4"></div>
+  <div class="config-row"><div class="config-label">Muertes T5</div><input type="number" min="0" class="config-input" id="cfgMuertesT5"></div>
+  <div class="config-row"><div class="config-label">Curación T4</div><input type="number" min="0" class="config-input" id="cfgCuradasT4"></div>
+  <div class="config-row"><div class="config-label">Curación T5</div><input type="number" min="0" class="config-input" id="cfgCuradasT5"></div>
+  <div style="font-weight:800;color:var(--accent);margin:16px 0 6px">Criterios opcionales</div>
+  <div class="config-row"><div class="config-label">Incluir construcción</div><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="cfgUsarConstruccion"> Considerar meta</label></div>
+  <div class="config-row"><div class="config-label">Construcción mínima (segundos)</div><input type="number" min="0" class="config-input" id="cfgConstruccion"></div>
+  <div class="config-row"><div class="config-label">Incluir destrucción</div><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="cfgUsarDestruccion"> Considerar meta</label></div>
+  <div class="config-row"><div class="config-label">Destrucción mínima (segundos)</div><input type="number" min="0" class="config-input" id="cfgDestruccion"></div>
+  <div style="font-weight:800;color:var(--accent);margin:16px 0 6px">Regla para clasificar</div>
+  <div class="config-row"><div class="config-label">Modo de cumplimiento</div><select class="config-input" id="cfgModo"><option value="any">Flexible: cumplir al menos una meta activa</option><option value="all">Estricto: cumplir todas las metas activas</option></select></div>
+  <div class="config-row"><div class="config-label">% mínimo (se conserva)</div><input type="number" min="0" class="config-input" id="cfgPct" step="0.1"></div>
+  <button onclick="saveConfig()" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#64b4ff,#3b82f6);border:none;border-radius:10px;color:#000;font-weight:900;cursor:pointer"><i class="fas fa-save"></i> GUARDAR CRITERIOS</button>
+  <div style="font-size:10px;color:var(--muted);margin-top:10px">Nota: en esta versión, la configuración se guarda en el almacenamiento local de este navegador. Para que R4/R5 compartan una misma configuración entre dispositivos, se requiere sincronizarla mediante una tabla/función segura de Supabase.</div></div></div>
 </div>
 <div id="toastBox" style="position:fixed;top:70px;right:16px;z-index:999999;display:flex;flex-direction:column;gap:6px"></div>
 <script>
-let config={poderMin:20000000,umbralNoAporta:100000,pctMinimo:12,poderGold:150000000,seFueDias:2};
+let config={poderMin:20000000,umbralNoAporta:100000,pctMinimo:12,poderGold:150000000,seFueDias:2,minMuertesT4:0,minMuertesT5:0,minCuradasT4:0,minCuradasT5:0,usarConstruccion:false,minConstruccion:0,usarDestruccion:false,minDestruccion:0,modoActividad:'any'};
 function safeSessionGet(key){try{return sessionStorage.getItem(key);}catch(e){return null;}}
 function safeSessionSet(key,value){try{sessionStorage.setItem(key,value);}catch(e){}}
 function safeSessionRemove(key){try{sessionStorage.removeItem(key);}catch(e){}}
@@ -570,6 +591,8 @@ function resetDashboardView(){
 }
 
 async function loadFromStorage(){
+  // La configuración se conserva localmente aunque los datos de jugadores vengan de Supabase.
+  try{const savedConfig=await idbGet('config');if(savedConfig)config={...config,...savedConfig};}catch(configLoadError){console.warn('No se pudo leer configuración local:',configLoadError);}
   // 1) Supabase = fuente compartida para todos los dispositivos.
   if(supabaseReady()){
     try{
@@ -748,7 +771,7 @@ let filesOpen=false;
 function toggleFilesPanel(){filesOpen=!filesOpen;document.getElementById('filesList').classList.toggle('open',filesOpen);}
 function renderFilesList(){const list=document.getElementById('filesList');const sorted=[...fileParsed].sort((a,b)=>b.date-a.date);document.getElementById('fileCount').textContent=sorted.length+' archivos';let html='';sorted.forEach((f,i)=>{const idx=fileParsed.indexOf(f);html+=`<div class="file-row"><div><span style="color:var(--muted)">#${i+1}</span> <span style="font-weight:600">${esc(f.name)}</span></div><button onclick="deleteFile(${idx})" style="background:none;border:none;color:var(--red);cursor:pointer"><i class="fas fa-trash-can"></i></button></div>`;});list.innerHTML=html||'<div style="padding:14px;text-align:center;color:var(--muted);font-size:10px">Sin archivos</div>';}
 async function deleteFile(idx){
-  if(session.level<3){toast('Solo R5','error');return;}
+  if(!session||session.role!=='lider'||Number(session.level||0)<3){toast('Solo R5','error');return;}
   const f=fileParsed[idx];if(!f)return;if(!confirm('¿Eliminar '+f.name+'?'))return;
   for(const id in allData){allData[id].history=allData[id].history.filter(h=>h.fileName!==f.name);if(allData[id].history.length===0)delete allData[id];}
   fileParsed.splice(idx,1);await saveToStorage();renderFilesList();analyze(true);toast('Eliminado','success');
@@ -785,14 +808,14 @@ async function enterApp(){
     if(login) login.style.display='none';
     if(main) main.classList.remove('hidden');
 
-    const role=session?.role || 'miembro';
+    const role=session?.role || 'publico';
     const creds=CREDS[role] || CREDS.miembro;
 
     const badge=document.getElementById('roleBadge');
     if(badge) badge.textContent=creds.label;
 
-    const isMiembro=role==='miembro';
-    const level=Number(session?.level || creds.level || 1);
+    const isMiembro=role==='miembro' || role==='publico';
+    const level=Number(session?.level ?? creds.level ?? 0);
 
     const upload=document.getElementById('uploadZone');
     const viewOnly=document.getElementById('viewOnlyMsg');
@@ -899,13 +922,16 @@ function togglePassword(){
 function doLogout(){session=null;safeSessionRemove('r127_session');location.reload();}
 (async function(){const s=safeSessionGet('r127_session');if(s){try{const j=JSON.parse(s);if(Date.now()-j.t<86400000){session=j;await enterApp();}}catch(e){}}})();
 const zone=document.getElementById('uploadZone'),fileInput=document.getElementById('fileInput');
-zone.addEventListener('click',()=>{if(session&&session.role!=='miembro')fileInput.click();});
-zone.addEventListener('dragover',e=>{e.preventDefault();if(session&&session.role!=='miembro')zone.classList.add('dragover');});
-zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
-zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragover');if(session&&session.role!=='miembro')handleFiles(e.dataTransfer.files);});
-fileInput.addEventListener('change',e=>{handleFiles(e.target.files);fileInput.value='';});
+function canManageKingdom(){return !!session && Number(session.level||0)>=2 && (session.role==='oficial'||session.role==='lider');}
+if(zone&&fileInput){
+  zone.addEventListener('click',()=>{if(canManageKingdom())fileInput.click();else toast('Solo R4 y R5 pueden cargar archivos','error');});
+  zone.addEventListener('dragover',e=>{e.preventDefault();if(canManageKingdom())zone.classList.add('dragover');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragover');if(canManageKingdom())handleFiles(e.dataTransfer.files);else toast('Solo R4 y R5 pueden cargar archivos','error');});
+  fileInput.addEventListener('change',e=>{if(canManageKingdom())handleFiles(e.target.files);else toast('Solo R4 y R5 pueden cargar archivos','error');fileInput.value='';});
+}
 async function handleFiles(files){
-  if(session.role==='miembro'){toast('Sin permisos','error');return;}
+  if(!canManageKingdom()){toast('Solo R4 y R5 pueden cargar archivos','error');return;}
   if(!files.length)return;
   document.getElementById('fileInfo').textContent='Leyendo...';
   let count=0;
@@ -1077,15 +1103,34 @@ function analyze(isLoad=false){
     const sum=k=>h.reduce((a,x)=>a+num(x[k]),0);
     // IMPORTANTE: "Total de méritos" ya representa los méritos del jugador.
     // "Méritos enemigos" se mantiene separado y NUNCA se suma al rendimiento.
+    // Los archivos se deduplican por fecha al cargarse; aquí se suman solo los registros diarios disponibles.
     const dM=sum('meritos'),dT4=sum('t4_muertas'),dT5=sum('t5_muertas'),dD=dT4+dT5;
     const dCT4=sum('t4_curadas'),dCT5=sum('t5_curadas'),dC=dCT4+dCT5;
     const dX=sum('destruccion'),dBuild=sum('construccion');
     const inf=sum('infanteria'),cab=sum('caballeria'),arc=sum('arqueros'),mag=sum('magos'),otr=sum('otros');
     const estabaEnUltimo=h.some(x=>x.dateKey===latestDateKey);
     const seFue=!estabaEnUltimo;
-    let st='PELEA';if(seFue)st='SE FUE';else if(h.length===1&&!isLoad)st='NUEVO';else if(dM<config.umbralNoAporta)st='NO APORTA';
+    const criterios=[
+      {key:'méritos propios',value:dM,min:num(config.umbralNoAporta),active:num(config.umbralNoAporta)>0},
+      {key:'muertes T4',value:dT4,min:num(config.minMuertesT4),active:num(config.minMuertesT4)>0},
+      {key:'muertes T5',value:dT5,min:num(config.minMuertesT5),active:num(config.minMuertesT5)>0},
+      {key:'curación T4',value:dCT4,min:num(config.minCuradasT4),active:num(config.minCuradasT4)>0},
+      {key:'curación T5',value:dCT5,min:num(config.minCuradasT5),active:num(config.minCuradasT5)>0},
+      {key:'construcción',value:dBuild,min:num(config.minConstruccion),active:!!config.usarConstruccion&&num(config.minConstruccion)>0},
+      {key:'destrucción',value:dX,min:num(config.minDestruccion),active:!!config.usarDestruccion&&num(config.minDestruccion)>0}
+    ].filter(c=>c.active);
+    const cumplidos=criterios.filter(c=>c.value>=c.min);
+    const incumplidos=criterios.filter(c=>c.value<c.min);
+    const datosInsuficientes=fileParsed.length>1&&h.length<2;
+    let st='PELEA',activityReason='Cumple: '+cumplidos.map(c=>c.key).join(', ');
+    if(seFue){st='SE FUE';activityReason='No aparece en el último día cargado ('+latestDateKey+')';}
+    else if(h.length===1&&!isLoad){st='NUEVO';activityReason='Solo cuenta con un día de información';}
+    else if(datosInsuficientes){st='REVISAR';activityReason='Solo cuenta con un día de información frente a '+fileParsed.length+' días cargados';}
+    else if(!criterios.length){st='REVISAR';activityReason='No hay metas de actividad activas';}
+    else if(config.modoActividad==='all' ? incumplidos.length>0 : cumplidos.length===0){st='NO APORTA';activityReason='No cumple: '+incumplidos.map(c=>c.key+' ('+fmt(c.value)+' / '+fmt(c.min)+')').join(', ');}
+    else {activityReason=(config.modoActividad==='all'?'Cumple todas las metas activas: ':'Cumple al menos una meta activa: ')+cumplidos.map(c=>c.key).join(', ');}
     tP+=num(last.poder_maximo);tM+=dM;tD+=dD;tC+=dBuild;tX+=dX;
-    computed.push({id,name:allData[id].name,poder:num(last.poder_maximo),poderActual:num(last.poder),meritos:dM,muertes:dD,muertesT4:dT4,muertesT5:dT5,curadas:dC,curadasT4:dCT4,curadasT5:dCT5,construccion:dBuild,destruccion:dX,infanteria:inf,caballeria:cab,arqueros:arc,magos:mag,otros:otr,status:st,rango:0,history:h,seFue});
+    computed.push({id,name:allData[id].name,poder:num(last.poder_maximo),poderActual:num(last.poder),meritos:dM,muertes:dD,muertesT4:dT4,muertesT5:dT5,curadas:dC,curadasT4:dCT4,curadasT5:dCT5,construccion:dBuild,destruccion:dX,infanteria:inf,caballeria:cab,arqueros:arc,magos:mag,otros:otr,status:st,activityReason,rango:0,history:h,seFue});
   }
   computed.sort((a,b)=>b.meritos-a.meritos);computed.forEach((c,i)=>c.rango=i+1);
   document.getElementById('sJ').textContent=computed.filter(c=>c.status!=='SE FUE').length;
@@ -1131,7 +1176,7 @@ document.querySelectorAll('th[data-col]').forEach(th=>{th.addEventListener('clic
 function renderTable(){
   const rows=getFiltered();const tp=Math.max(1,Math.ceil(rows.length/PER_PAGE));if(currentPage>tp)currentPage=tp;
   const page=rows.slice((currentPage-1)*PER_PAGE,(currentPage-1)*PER_PAGE+PER_PAGE);
-  let html='';for(const r of page){let bc=r.status==='PELEA'?'b-pelea':r.status==='NO APORTA'?'b-noaporta':r.status==='NUEVO'?'b-nuevo':'b-sefue';const isGold=r.poder>=config.poderGold;const noteDot=playerNotes[r.id]&&playerNotes[r.id].trim()?'<span class="note-dot"></span>':'';html+=`<tr data-id="${esc(r.id)}"><td style="font-weight:900;color:${r.rango<=3?'#f5c518':'#8e93b0'}">${r.rango}</td><td style="font-weight:700" class="${isGold?'poder-gold':''}">${esc(r.name)}${noteDot}</td><td style="font-size:9px;color:var(--muted);font-family:monospace" title="${esc(r.id)}">${esc(r.id.slice(-8))}</td><td class="${isGold?'poder-gold':''}">${fmt(r.poder)}</td><td>${fmt(r.meritos)}</td><td>${fmt(r.muertesT4)}</td><td>${fmt(r.muertesT5)}</td><td>${fmt(r.curadasT4)}</td><td>${fmt(r.curadasT5)}</td><td><span class="badge ${bc}">${esc(r.status)}</span></td></tr>`;}
+  let html='';for(const r of page){let bc=r.status==='PELEA'?'b-pelea':r.status==='NO APORTA'?'b-noaporta':r.status==='NUEVO'?'b-nuevo':r.status==='REVISAR'?'b-revisar':'b-sefue';const isGold=r.poder>=config.poderGold;const noteDot=playerNotes[r.id]&&playerNotes[r.id].trim()?'<span class="note-dot"></span>':'';html+=`<tr data-id="${esc(r.id)}"><td style="font-weight:900;color:${r.rango<=3?'#f5c518':'#8e93b0'}">${r.rango}</td><td style="font-weight:700" class="${isGold?'poder-gold':''}">${esc(r.name)}${noteDot}</td><td style="font-size:9px;color:var(--muted);font-family:monospace" title="${esc(r.id)}">${esc(r.id.slice(-8))}</td><td class="${isGold?'poder-gold':''}">${fmt(r.poder)}</td><td>${fmt(r.meritos)}</td><td>${fmt(r.muertesT4)}</td><td>${fmt(r.muertesT5)}</td><td>${fmt(r.curadasT4)}</td><td>${fmt(r.curadasT5)}</td><td><span class="badge ${bc}" title="${esc(r.activityReason||r.status)}">${esc(r.status)}</span></td></tr>`;}
   document.getElementById('tBody').innerHTML=html||`<tr><td colspan=10 style="text-align:center;padding:30px;color:#8e93b0">Sin resultados</td></tr>`;
   document.querySelectorAll('#tBody tr[data-id]').forEach(tr=>tr.addEventListener('click',()=>openModal(tr.dataset.id)));
   const pag=document.getElementById('pagination');if(tp<=1){pag.innerHTML='';return;}let pp=`<button class="pg-btn" onclick="goP(${currentPage-1})"><</button>`;for(let i=1;i<=Math.min(tp,7);i++){pp+=`<button class="pg-btn ${i===currentPage?'active':''}" onclick="goP(${i})">${i}</button>`;}pp+=`<button class="pg-btn" onclick="goP(${currentPage+1})">></button>`;pag.innerHTML=pp;
@@ -1238,7 +1283,7 @@ function openModal(id){
   },100);
   document.getElementById('modalOverlay').classList.add('active');
 }
-async function saveNote(){if(!currentModalId)return;if(session.level<2){toast('Solo R4+','error');return;}const text=document.getElementById('noteArea').value.trim();if(text)playerNotes[currentModalId]=text;else delete playerNotes[currentModalId];await saveToStorage();renderTable();toast('Nota guardada','success');}
+async function saveNote(){if(!currentModalId)return;if(!canManageKingdom()){toast('Solo R4+','error');return;}const text=document.getElementById('noteArea').value.trim();if(text)playerNotes[currentModalId]=text;else delete playerNotes[currentModalId];await saveToStorage();renderTable();toast('Nota guardada','success');}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('active');}
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target.id==='modalOverlay')closeModal();});
 function exportarJugadorExcel(){
@@ -1271,18 +1316,24 @@ function runCompare(){
       }});},150);
 }
 
-function openConfig(){if(session.role!=='lider'){toast('Solo R5','error');return;}document.getElementById('cfgPoderMin').value=config.poderMin;document.getElementById('cfgUmbral').value=config.umbralNoAporta;document.getElementById('cfgPct').value=config.pctMinimo;document.getElementById('cfgGold').value=config.poderGold;document.getElementById('cfgDias').value=config.seFueDias;document.getElementById('configOverlay').classList.add('active');}
+function openConfig(){if(!session||session.level<2){toast('Solo R4 y R5','error');return;}
+  const fields={cfgPoderMin:config.poderMin,cfgUmbral:config.umbralNoAporta,cfgPct:config.pctMinimo,cfgGold:config.poderGold,cfgDias:config.seFueDias,cfgMuertesT4:config.minMuertesT4,cfgMuertesT5:config.minMuertesT5,cfgCuradasT4:config.minCuradasT4,cfgCuradasT5:config.minCuradasT5,cfgConstruccion:config.minConstruccion,cfgDestruccion:config.minDestruccion};
+  Object.entries(fields).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value??0;});
+  document.getElementById('cfgUsarConstruccion').checked=!!config.usarConstruccion;document.getElementById('cfgUsarDestruccion').checked=!!config.usarDestruccion;document.getElementById('cfgModo').value=config.modoActividad||'any';document.getElementById('configOverlay').classList.add('active');}
 function closeConfig(){document.getElementById('configOverlay').classList.remove('active');}
 document.getElementById('configOverlay').addEventListener('click',e=>{if(e.target.id==='configOverlay')closeConfig();});
 async function saveConfig(){
-  const pm=parseInt(document.getElementById('cfgPoderMin').value);
-  const um=parseInt(document.getElementById('cfgUmbral').value);
-  const pc=parseFloat(document.getElementById('cfgPct').value);
-  const go=parseInt(document.getElementById('cfgGold').value);
-  const di=parseInt(document.getElementById('cfgDias').value);
-  if(isNaN(pm)||isNaN(um)||isNaN(pc)||isNaN(go)||isNaN(di)){toast('Valores inválidos','error');return;}
-  config.poderMin=pm;config.umbralNoAporta=um;config.pctMinimo=pc;config.poderGold=go;config.seFueDias=di;
-  await saveToStorage();analyze(true);closeConfig();toast('Config guardada','success');
+  if(!canManageKingdom()){toast('Solo R4 y R5 pueden cambiar los criterios','error');return;}
+  const ids=['cfgPoderMin','cfgUmbral','cfgPct','cfgGold','cfgDias','cfgMuertesT4','cfgMuertesT5','cfgCuradasT4','cfgCuradasT5','cfgConstruccion','cfgDestruccion'];
+  const vals={};for(const id of ids){const el=document.getElementById(id);const v=Number(el.value);if(el.value.trim()===''||!Number.isFinite(v)||v<0){toast('Revisa los valores: deben ser números iguales o mayores que cero','error');el.focus();return;}vals[id]=v;}
+  if(vals.cfgDias<1){toast('Días para Se fue debe ser al menos 1','error');return;}
+  const modo=document.getElementById('cfgModo').value;
+  const activeCount=[vals.cfgUmbral,vals.cfgMuertesT4,vals.cfgMuertesT5,vals.cfgCuradasT4,vals.cfgCuradasT5,(document.getElementById('cfgUsarConstruccion').checked?vals.cfgConstruccion:0),(document.getElementById('cfgUsarDestruccion').checked?vals.cfgDestruccion:0)].filter(v=>v>0).length;
+  if(!activeCount){toast('Activa al menos una meta con un valor mayor que cero','error');return;}
+  config.poderMin=vals.cfgPoderMin;config.umbralNoAporta=vals.cfgUmbral;config.pctMinimo=vals.cfgPct;config.poderGold=vals.cfgGold;config.seFueDias=vals.cfgDias;
+  config.minMuertesT4=vals.cfgMuertesT4;config.minMuertesT5=vals.cfgMuertesT5;config.minCuradasT4=vals.cfgCuradasT4;config.minCuradasT5=vals.cfgCuradasT5;
+  config.usarConstruccion=document.getElementById('cfgUsarConstruccion').checked;config.minConstruccion=vals.cfgConstruccion;config.usarDestruccion=document.getElementById('cfgUsarDestruccion').checked;config.minDestruccion=vals.cfgDestruccion;config.modoActividad=modo;
+  await saveToStorage();analyze(true);closeConfig();toast('Criterios guardados en este navegador. La sincronización global se habilitará en la siguiente fase.','success');
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
