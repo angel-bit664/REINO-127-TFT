@@ -358,6 +358,89 @@ function setRemoteStatus(msg,type='info'){
 .cod-result-meta{font-size:9px;color:var(--muted);margin-top:2px}
 @media(max-width:700px){.cod-search-row{grid-template-columns:1fr 1fr}.cod-search-row input{grid-column:1/-1}.cod-search-btn{grid-column:1/-1}.cod-result-grid{grid-template-columns:1fr 1fr}}
 
+/* ===== Mejora visual REINO 127: tarjetas, gráficas y jerarquía ===== */
+:root{--surface-raised:#171d33;--chart-grid:rgba(148,163,184,.13);--chart-text:#aeb8d0}
+body{background:radial-gradient(ellipse at 12% -8%,rgba(44,82,160,.13),transparent 36%),radial-gradient(ellipse at 92% 8%,rgba(245,197,24,.055),transparent 28%),var(--bg)}
+.header{background:rgba(14,18,34,.94);box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.stat-card,.chart-card,.period-card,.files-panel,.table-container,.cod-search-panel{box-shadow:0 8px 24px rgba(0,0,0,.12);transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+.stat-card{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(24,31,55,.98),rgba(17,22,40,.98))}
+.stat-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),rgba(245,197,24,.08));opacity:.8}
+.stat-card:hover,.chart-card:hover,.period-card:hover{border-color:rgba(100,180,255,.28);box-shadow:0 12px 30px rgba(0,0,0,.2)}
+.stat-label{letter-spacing:.65px}.stat-value{letter-spacing:-.45px}
+.tabs-bar{gap:8px}.tab-btn{transition:all .18s ease}.tab-btn:hover{color:#fff;border-color:rgba(245,197,24,.35);transform:translateY(-1px)}
+.toolbar .btn-sm{transition:transform .16s ease,border-color .16s ease,filter .16s ease}.toolbar .btn-sm:hover{transform:translateY(-1px);filter:brightness(1.12)}
+.chart-controls{background:linear-gradient(145deg,rgba(22,28,49,.98),rgba(17,22,39,.98));box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.period-card{background:linear-gradient(145deg,rgba(24,31,55,.98),rgba(17,22,40,.98))}
+.chart-card{background:linear-gradient(155deg,rgba(23,29,51,.98),rgba(16,21,38,.99));border-color:rgba(100,130,190,.16);padding:16px}
+.chart-title{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.15px;margin-bottom:13px}
+.chart-title::before{content:"";width:4px;height:15px;border-radius:4px;background:var(--accent);box-shadow:0 0 12px rgba(245,197,24,.2);flex:0 0 auto}
+.chart-wrap{height:270px}.alliance-chart-wrap{height:560px}.charts-grid{gap:12px}.alliance-chart-card{padding:18px}
+.table-container{border-color:rgba(100,130,190,.18)}th{letter-spacing:.45px}tbody tr:nth-child(even){background:rgba(255,255,255,.012)}tbody tr:hover{background:rgba(100,180,255,.075)}
+.note-area:focus,.search-input:focus,.filter-sel:focus{border-color:rgba(100,180,255,.65);box-shadow:0 0 0 3px rgba(100,180,255,.08)}
+.modal-content{background:linear-gradient(155deg,#151b30,#101525);box-shadow:0 24px 80px rgba(0,0,0,.45)}
+.detail-canvas-wrap{background:rgba(10,14,27,.55);border-color:rgba(100,130,190,.18);position:relative;height:270px;min-height:270px;overflow:hidden}
+/* Altura limitada para evitar que los gráficos del modal crezcan sin límite. */
+.detail-canvas-wrap canvas{display:block;width:100%!important;height:205px!important;max-height:205px!important}
+#compareOverlay .detail-canvas-wrap{height:300px;min-height:300px}
+#compareOverlay .detail-canvas-wrap canvas{height:230px!important;max-height:230px!important}
+.modal-content{overflow-x:hidden}
+@media(max-width:800px){.chart-wrap{height:250px}.alliance-chart-wrap{height:430px}.chart-card{padding:12px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+
+
+/* Panel de gráficas de alianza: lectura por ranking y control de densidad */
+.alliance-chart-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.alliance-chart-head .chart-title{margin:0;min-width:220px}
+.alliance-chart-tools{display:flex;align-items:center;gap:8px}
+.alliance-chart-tools label{font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.35px}
+.alliance-chart-tools select{min-width:112px;padding:8px 10px}
+.alliance-chart-wrap{height:695px;position:relative;overflow:hidden;border-radius:8px;background:linear-gradient(180deg,rgba(7,12,25,.22),rgba(7,12,25,.05));}
+.alliance-chart-foot{font-size:9px;color:var(--muted);padding-top:10px;margin-top:8px;border-top:1px solid rgba(148,163,184,.12)}
+.alliance-chart-card{padding:18px;background:linear-gradient(155deg,rgba(23,29,51,.99),rgba(13,19,35,.99))}
+@media(max-width:800px){.alliance-chart-wrap{height:540px}.alliance-chart-head{align-items:flex-start}.alliance-chart-tools{width:100%;justify-content:space-between}.alliance-chart-tools select{flex:1}}
+
+
+/* Panel KPI de periodo: tarjetas premium, legibles y adaptables */
+.period-summary{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 16px 16px;}
+.period-card{position:relative;isolation:isolate;overflow:hidden;min-height:108px;text-align:left;padding:15px 15px 13px 17px;border-radius:15px;border:1px solid rgba(123,151,205,.19);background:linear-gradient(145deg,rgba(25,34,59,.98),rgba(15,21,39,.98));box-shadow:0 8px 22px rgba(0,0,0,.16);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
+.period-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--kpi-color,#64b4ff);border-radius:4px 0 0 4px;}
+.period-card::after{content:"";position:absolute;z-index:-1;right:-22px;top:-30px;width:100px;height:100px;border-radius:50%;background:var(--kpi-glow,rgba(100,180,255,.12));filter:blur(3px);}
+.period-card:hover{transform:translateY(-2px);border-color:rgba(130,170,240,.38);box-shadow:0 13px 28px rgba(0,0,0,.22);}
+.period-card .label{display:flex;align-items:center;gap:7px;font-size:9px;letter-spacing:.75px;line-height:1.4;color:#9daaca;font-weight:800;text-transform:uppercase;}
+.period-card .value{font-size:clamp(18px,1.6vw,25px);line-height:1.25;letter-spacing:-.6px;font-weight:900;margin-top:12px;color:#f5f7ff;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;}
+.period-card .kpi-foot{font-size:9px;color:#7f8ba9;margin-top:5px;line-height:1.35;}
+.period-card.kpi-blue{--kpi-color:#64b4ff;--kpi-glow:rgba(100,180,255,.12)}
+.period-card.kpi-gold{--kpi-color:#f5c518;--kpi-glow:rgba(245,197,24,.13)}
+.period-card.kpi-red{--kpi-color:#ff646f;--kpi-glow:rgba(255,90,100,.13)}
+.period-card.kpi-green{--kpi-color:#21e6a0;--kpi-glow:rgba(33,230,160,.12)}
+.period-card.kpi-purple{--kpi-color:#a78bfa;--kpi-glow:rgba(167,139,250,.13)}
+.period-card.kpi-gold .value{color:#ffd84d}.period-card.kpi-red .value{color:#ff737c}.period-card.kpi-green .value{color:#32e8ac}.period-card.kpi-blue .value{color:#83c7ff}.period-card.kpi-purple .value{color:#c1a8ff}
+@media(max-width:1100px){.period-summary{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:700px){.period-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-left:10px;margin-right:10px}.period-card{min-height:96px;padding:12px 11px 11px 14px}.period-card .value{font-size:18px;margin-top:9px}.period-card .label{font-size:8px}}
+@media(max-width:390px){.period-summary{grid-template-columns:1fr 1fr}.period-card .value{font-size:16px}}
+
+
+/* KPI premium superior: mismo lenguaje visual que las tarjetas del periodo */
+.stats-grid-premium{align-items:stretch;gap:10px}
+.stats-grid-premium .stat-card{
+  --kpi:#f5c518;position:relative;isolation:isolate;overflow:hidden;min-height:104px;
+  padding:13px 14px 12px;border-radius:15px;
+  background:linear-gradient(145deg,rgba(20,28,48,.98),rgba(15,21,38,.98));
+  border:1px solid color-mix(in srgb,var(--kpi) 20%,#202a43);
+  box-shadow:0 8px 22px rgba(0,0,0,.15);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.stats-grid-premium .stat-card::before{content:"";position:absolute;z-index:-1;right:-28px;top:-36px;width:105px;height:105px;border-radius:50%;background:var(--kpi);opacity:.10;filter:blur(2px)}
+.stats-grid-premium .stat-card::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--kpi)}
+.stats-grid-premium .stat-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--kpi) 48%,#202a43);box-shadow:0 12px 26px rgba(0,0,0,.22)}
+.stats-grid-premium .stat-topline{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:7px}
+.stats-grid-premium .stat-icon{width:25px;height:25px;flex:0 0 25px;display:grid;place-items:center;border-radius:8px;background:color-mix(in srgb,var(--kpi) 14%,transparent);color:var(--kpi);font-size:11px}
+.stats-grid-premium .stat-label{font-size:8px;letter-spacing:.65px;line-height:1.35;color:#aebbd3;font-weight:800}
+.stats-grid-premium .stat-value{font-size:clamp(20px,1.7vw,27px);line-height:1.1;font-weight:900;letter-spacing:-.65px;color:var(--kpi);margin:0 0 6px;overflow-wrap:anywhere}
+.stats-grid-premium .stat-caption{font-size:9px;line-height:1.4;color:#8493b0;max-width:100%}
+.stats-grid-premium .kpi-blue{--kpi:#72c2ff}.stats-grid-premium .kpi-purple{--kpi:#b3a0ff}.stats-grid-premium .kpi-red{--kpi:#ff737c}.stats-grid-premium .kpi-gold{--kpi:#ffd84d}.stats-grid-premium .kpi-cyan{--kpi:#43e6c1}
+@media(max-width:1100px){.stats-grid-premium{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.stats-grid-premium{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stats-grid-premium .stat-card{min-height:100px;padding:11px}.stats-grid-premium .stat-value{font-size:21px}.stats-grid-premium .stat-caption{font-size:8px}}
+
 </style>
 </head>
 <body>
@@ -445,7 +528,15 @@ function setRemoteStatus(msg,type='info'){
   </section>
 
   <div class="files-panel oficial-only" id="filesPanel"><div class="files-header" onclick="toggleFilesPanel()"><div style="display:flex;align-items:center;gap:8px"><i class="fas fa-folder-open" style="color:var(--accent)"></i><span style="font-size:11px;font-weight:700">Archivos cargados</span><span id="fileCount" style="font-size:9px;color:var(--muted)">0</span></div><i class="fas fa-chevron-down" id="filesChevron" style="font-size:10px;color:var(--muted)"></i></div><div class="files-list" id="filesList"></div></div>
-  <div class="stats-grid"><div class="stat-card"><div class="stat-label">Jugadores 20M+</div><div class="stat-value" id="sJ">—</div></div><div class="stat-card"><div class="stat-label">Poder Máx. Histórico Total</div><div class="stat-value" id="sP">—</div></div><div class="stat-card"><div class="stat-label">Muertes</div><div class="stat-value" style="color:var(--red)" id="sD">—</div></div><div class="stat-card"><div class="stat-label">Mérito Prom</div><div class="stat-value" style="color:var(--accent)" id="sMP">—</div></div><div class="stat-card"><div class="stat-label">Méritos Total</div><div class="stat-value" id="sMT">—</div></div><div class="stat-card"><div class="stat-label">Construcción</div><div class="stat-value" style="color:var(--blue)" id="sC">—</div></div><div class="stat-card"><div class="stat-label">Destrucción</div><div class="stat-value" style="color:var(--red)" id="sX">—</div></div></div>
+  <div class="stats-grid stats-grid-premium">
+  <div class="stat-card kpi-blue"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-users"></i></span><span class="stat-label">Jugadores 20M+</span></div><div class="stat-value" id="sJ">—</div><div class="stat-caption">Jugadores que cumplen el mínimo de poder</div></div>
+  <div class="stat-card kpi-purple"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-bolt"></i></span><span class="stat-label">Poder máx. histórico total</span></div><div class="stat-value" id="sP">—</div><div class="stat-caption">Suma del máximo histórico de poder</div></div>
+  <div class="stat-card kpi-red"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-skull"></i></span><span class="stat-label">Muertes</span></div><div class="stat-value" id="sD">—</div><div class="stat-caption">Muertes T4 y T5 registradas</div></div>
+  <div class="stat-card kpi-gold"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-chart-line"></i></span><span class="stat-label">Mérito promedio</span></div><div class="stat-value" id="sMP">—</div><div class="stat-caption">Promedio por jugador incluido</div></div>
+  <div class="stat-card kpi-gold"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-trophy"></i></span><span class="stat-label">Méritos totales</span></div><div class="stat-value" id="sMT">—</div><div class="stat-caption">Méritos propios acumulados</div></div>
+  <div class="stat-card kpi-cyan"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-hammer"></i></span><span class="stat-label">Construcción</span></div><div class="stat-value" id="sC">—</div><div class="stat-caption">Tiempo total registrado</div></div>
+  <div class="stat-card kpi-red"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-fire"></i></span><span class="stat-label">Destrucción</span></div><div class="stat-value" id="sX">—</div><div class="stat-caption">Tiempo total registrado</div></div>
+</div>
   <nav class="tabs-bar"><button class="tab-btn active" data-tab="jugadores" onclick="switchTab('jugadores')"><i class="fas fa-users"></i> Jugadores <span id="cAll">0</span></button><button class="tab-btn" data-tab="graficos" onclick="switchTab('graficos')"><i class="fas fa-chart-bar"></i> Gráficos</button><button class="tab-btn" data-tab="noaportan" onclick="switchTab('noaportan')"><i class="fas fa-circle-xmark"></i> No Aportan <span id="cNA">0</span></button><button class="tab-btn" data-tab="sefueron" onclick="switchTab('sefueron')"><i class="fas fa-door-open"></i> Se Fueron <span id="cSF">0</span></button></nav>
   <section id="view-jugadores">
     <div class="toolbar">
@@ -469,7 +560,7 @@ function setRemoteStatus(msg,type='info'){
       <button class="btn-sm" onclick="resetAllianceChartDates()"><i class="fas fa-calendar-days"></i> TODO</button>
     </div>
     <div class="period-summary" id="periodSummary"></div>
-    <div class="chart-card alliance-chart-card"><div class="chart-title" id="allianceChartTitle">Rendimiento general de la alianza</div><div class="chart-wrap alliance-chart-wrap"><canvas id="chAlliance"></canvas></div></div>
+    <div class="chart-card alliance-chart-card"><div class="alliance-chart-head"><div class="chart-title" id="allianceChartTitle">Rendimiento general de la alianza</div><div class="alliance-chart-tools"><label for="allianceTopLimit">Mostrar jugadores</label><select id="allianceTopLimit" class="filter-sel" onchange="renderAllianceChart()"><option value="10">Top 10</option><option value="25" selected>Top 25</option><option value="50">Top 50</option><option value="all">Todos</option></select></div></div><div class="alliance-chart-wrap"><canvas id="chAlliance"></canvas></div><div id="allianceChartFoot" class="alliance-chart-foot"></div></div>
     <div class="charts-grid"><div class="chart-card"><div class="chart-title">Top 10 Méritos propios</div><div class="chart-wrap"><canvas id="chMeritos"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 15 Muertes T4 + T5</div><div class="chart-wrap"><canvas id="chMuertes"></canvas></div></div><div class="chart-card"><div class="chart-title">Distribución</div><div class="chart-wrap"><canvas id="chEstados"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Poder</div><div class="chart-wrap"><canvas id="chPoder"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Curación T4 + T5</div><div class="chart-wrap"><canvas id="chCuracion"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Muertes T4</div><div class="chart-wrap"><canvas id="chMuertesT4"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Muertes T5</div><div class="chart-wrap"><canvas id="chMuertesT5"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Curación T4</div><div class="chart-wrap"><canvas id="chCuracionT4"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Curación T5</div><div class="chart-wrap"><canvas id="chCuracionT5"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Construcción</div><div class="chart-wrap"><canvas id="chConstruccion"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Destrucción</div><div class="chart-wrap"><canvas id="chDestruccion"></canvas></div></div></div>
   </section>
   <div class="modal-overlay" id="modalOverlay"><div class="modal-content">
@@ -517,6 +608,35 @@ function setRemoteStatus(msg,type='info'){
 </div>
 <div id="toastBox" style="position:fixed;top:70px;right:16px;z-index:999999;display:flex;flex-direction:column;gap:6px"></div>
 <script>
+// Tema global de gráficas: alto contraste, ejes limpios y tooltips legibles.
+// Solo modifica presentación; no altera datos, filtros ni cálculos.
+if (window.Chart) {
+  Chart.defaults.color = '#aeb8d0';
+  Chart.defaults.font.family = "'Inter', system-ui, -apple-system, Segoe UI, sans-serif";
+  Chart.defaults.font.size = 10;
+  Chart.defaults.animation.duration = 650;
+  Chart.defaults.responsive = true;
+  Chart.defaults.maintainAspectRatio = true;
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.plugins.legend.labels.boxWidth = 8;
+  Chart.defaults.plugins.legend.labels.padding = 14;
+  Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(7,11,23,.96)';
+  Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+  Chart.defaults.plugins.tooltip.bodyColor = '#dce5f7';
+  Chart.defaults.plugins.tooltip.borderColor = 'rgba(100,180,255,.32)';
+  Chart.defaults.plugins.tooltip.borderWidth = 1;
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.cornerRadius = 9;
+  Chart.defaults.elements.line.borderWidth = 2.5;
+  Chart.defaults.elements.line.tension = 0.32;
+  Chart.defaults.elements.point.radius = 2.5;
+  Chart.defaults.elements.point.hoverRadius = 5;
+  Chart.defaults.elements.bar.borderRadius = 6;
+  Chart.defaults.elements.bar.borderSkipped = false;
+  Chart.defaults.scale.grid.color = 'rgba(148,163,184,.13)';
+  Chart.defaults.scale.border.color = 'rgba(148,163,184,.12)';
+}
+
 let config={poderMin:20000000,umbralNoAporta:100000,pctMinimo:12,poderGold:150000000,seFueDias:2,minMuertesT4:0,minMuertesT5:0,minCuradasT4:0,minCuradasT5:0,usarConstruccion:false,minConstruccion:0,usarDestruccion:false,minDestruccion:0,modoActividad:'any'};
 function safeSessionGet(key){try{return sessionStorage.getItem(key);}catch(e){return null;}}
 function safeSessionSet(key,value){try{sessionStorage.setItem(key,value);}catch(e){}}
@@ -646,16 +766,8 @@ async function loadFromStorage(){
           dates.set(dateKey,true);
         }
         fileParsed=[...dates.keys()].sort().map(k=>({name:'Supabase • '+k,date:new Date(k+'T00:00:00'),dateKey:k}));
-        // Convertir acumulados de Supabase en valores diarios para que el análisis no duplique méritos.
-        for(const id in allData){
-          const h=allData[id].history.sort((a,b)=>a.date-b.date);
-          for(let i=h.length-1;i>0;i--){
-            const prev=h[i-1],cur=h[i];
-            for(const k of ['meritos','muertes','meritosEnemigos','infanteria','caballeria','arqueros','magos','otros','construccion','destruccion']){
-              const diff=num(cur[k])-num(prev[k]); cur[k]=diff<0?num(cur[k]):diff;
-            }
-          }
-        }
+        // IMPORTANTE: conservar los snapshots originales de Supabase sin modificarlos.
+        // Las diferencias diarias se calculan en analyze() sobre una copia del historial.
         await idbSet('allData',allData);
         await idbSet('fileParsed',fileParsed);
         analyze(true);
@@ -994,8 +1106,10 @@ async function syncCurrentData(ev){
     }
     const idMap={};(found||[]).forEach(r=>idMap[String(r.player_id)]=r.id);
 
-    // C) Guardar cada snapshot en estadisticas_diarias.
-    // Los campos son los que verificamos en Supabase.
+    // C) Guardar los snapshots originales en estadisticas_diarias.
+    // La conversión a incrementos diarios ocurre solo en analyze(), sobre una copia.
+    // on_conflict=jugador_id,fecha permite repetir la sincronización sin duplicar filas,
+    // siempre que exista en Supabase la restricción UNIQUE correspondiente.
     const rows=[];
     for(const id in allData){
       const jid=idMap[String(id)]; if(jid==null)continue;
@@ -1096,8 +1210,24 @@ function analyze(isLoad=false){
   const latestDateKey=fileParsed[fileParsed.length-1]?.dateKey;
   computed=[];let tP=0,tM=0,tD=0,tC=0,tX=0;
   for(const id in allData){
-    const h=allData[id].history.filter(x=>x&&x.date).sort((a,b)=>a.date-b.date);
+    // Copia del historial: el análisis nunca debe modificar los datos originales sincronizados.
+    const h=allData[id].history
+      .filter(x=>x&&x.date)
+      .sort((a,b)=>a.date-b.date)
+      .map(x=>({...x}));
     if(!h.length)continue;
+
+    // Los archivos históricos se manejan como snapshots acumulados.
+    // Convertimos a incrementos diarios únicamente esta copia usada para cálculos/gráficas.
+    // Esto mantiene iguales los resultados antes y después de sincronizar, sin restar dos veces.
+    const cumulativeKeys=['meritos','muertes','meritosEnemigos','infanteria','caballeria','arqueros','magos','otros','construccion','destruccion'];
+    for(let i=h.length-1;i>0;i--){
+      const prev=h[i-1],cur=h[i];
+      for(const k of cumulativeKeys){
+        const currentValue=num(cur[k]),previousValue=num(prev[k]);
+        cur[k]=currentValue>=previousValue ? currentValue-previousValue : currentValue;
+      }
+    }
     const last=h[h.length-1];
     if(last.poder_maximo<config.poderMin)continue;
     const sum=k=>h.reduce((a,x)=>a+num(x[k]),0);
@@ -1215,19 +1345,31 @@ function renderAllianceChart(){
   if(start&&end&&start>end){toast('La fecha inicial no puede ser mayor a la final','error');return;}
   const rows=getAlliancePeriodRows(start,end).sort((a,b)=>num(b[metric])-num(a[metric]));
   const labels={meritos:'Méritos propios',t4_muertas:'Muertes T4',t5_muertas:'Muertes T5',curadasT4:'Curación T4',curadasT5:'Curación T5',t4_curadas:'Curación T4',t5_curadas:'Curación T5',muertes:'Muertes T4 + T5',curadas:'Curación T4 + T5'};
-  document.getElementById('allianceChartTitle').textContent=`Toda la alianza • ${labels[metric]||metric} • ${start||'inicio'} → ${end||'hoy'}`;
+  const limitValue=document.getElementById('allianceTopLimit')?.value||'25';
+  const chartRows=limitValue==='all'?rows:rows.slice(0,Math.max(1,Number(limitValue)||25));
+  document.getElementById('allianceChartTitle').textContent=`Rendimiento de la alianza • ${labels[metric]||metric} • ${start||'inicio'} → ${end||'hoy'}`;
+  const foot=document.getElementById('allianceChartFoot');
+  if(foot)foot.textContent=`Mostrando ${chartRows.length} de ${rows.length} jugadores · Las tarjetas superiores resumen a todos los jugadores del periodo.`;
   const totals={meritos:rows.reduce((a,r)=>a+r.meritos,0),muertes:rows.reduce((a,r)=>a+r.muertes,0),curadas:rows.reduce((a,r)=>a+r.curadas,0),t4m:rows.reduce((a,r)=>a+r.t4_muertas,0),t5m:rows.reduce((a,r)=>a+r.t5_muertas,0),t4c:rows.reduce((a,r)=>a+r.t4_curadas,0),t5c:rows.reduce((a,r)=>a+r.t5_curadas,0)};
-  document.getElementById('periodSummary').innerHTML=`<div class="period-card"><div class="label">Jugadores con datos</div><div class="value">${rows.length}</div></div><div class="period-card"><div class="label">Méritos propios</div><div class="value" style="color:var(--accent)">${fmt(totals.meritos)}</div></div><div class="period-card"><div class="label">Muertes T4 / T5</div><div class="value" style="color:var(--red)">${fmt(totals.t4m)} / ${fmt(totals.t5m)}</div></div><div class="period-card"><div class="label">Curación T4 / T5</div><div class="value" style="color:var(--green)">${fmt(totals.t4c)} / ${fmt(totals.t5c)}</div></div><div class="period-card"><div class="label">Días seleccionados</div><div class="value">${rows.length?Math.max(...rows.map(r=>r.days)):0}</div></div>`;
+  const daysSelected=rows.length?Math.max(...rows.map(r=>r.days)):0;
+  document.getElementById('periodSummary').innerHTML=`
+    <div class="period-card kpi-blue"><div class="label"><i class="fas fa-users"></i> Jugadores con datos</div><div class="value">${rows.length.toLocaleString('es-MX')}</div><div class="kpi-foot">Con registros en el periodo</div></div>
+    <div class="period-card kpi-gold"><div class="label"><i class="fas fa-trophy"></i> Méritos propios</div><div class="value">${fmt(totals.meritos)}</div><div class="kpi-foot">Total de la alianza · periodo completo</div></div>
+    <div class="period-card kpi-red"><div class="label"><i class="fas fa-skull"></i> Muertes T4 / T5</div><div class="value">${fmt(totals.t4m)} <span style="color:#7f8ba9;font-size:.75em">/</span> ${fmt(totals.t5m)}</div><div class="kpi-foot">T4 a la izquierda · T5 a la derecha</div></div>
+    <div class="period-card kpi-green"><div class="label"><i class="fas fa-heart-pulse"></i> Curación T4 / T5</div><div class="value">${fmt(totals.t4c)} <span style="color:#7f8ba9;font-size:.75em">/</span> ${fmt(totals.t5c)}</div><div class="kpi-foot">T4 a la izquierda · T5 a la derecha</div></div>
+    <div class="period-card kpi-purple"><div class="label"><i class="far fa-calendar-days"></i> Días seleccionados</div><div class="value">${daysSelected}</div><div class="kpi-foot">Máximo de días disponibles por jugador</div></div>`;
   if(charts.alliance){try{charts.alliance.destroy();}catch(e){}}
   const canvas=document.getElementById('chAlliance');
-  charts.alliance=new Chart(canvas,{type:'bar',data:{labels:rows.map(r=>r.name),datasets:[{label:labels[metric]||metric,data:rows.map(r=>num(r[metric])),borderRadius:5}]},options:{plugins:{legend:{display:false}},indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+  const wrap=canvas?.parentElement;
+  if(wrap)wrap.style.height=(limitValue==='all'?'560px':Math.max(300,chartRows.length*25+70)+'px');
+  charts.alliance=new Chart(canvas,{type:'bar',data:{labels:chartRows.map(r=>r.name),datasets:[{label:labels[metric]||metric,data:chartRows.map(r=>num(r[metric])),backgroundColor:chartRows.map((r,i)=>i===0?'rgba(245,197,24,.92)':i<3?'rgba(100,180,255,.88)':'rgba(67,143,207,.72)'),borderColor:chartRows.map((r,i)=>i===0?'#f5c518':i<3?'#8bd0ff':'rgba(100,180,255,.35)'),borderWidth:1,borderRadius:5,barPercentage:.78,categoryPercentage:.84}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:500},interaction:{mode:'nearest',axis:'y',intersect:false},plugins:{legend:{display:false},tooltip:{displayColors:false,callbacks:{label:ctx=>' '+(labels[metric]||metric)+': '+Number(ctx.raw||0).toLocaleString('es-MX')}}},scales:{x:{beginAtZero:true,grid:{color:'rgba(148,163,184,.13)'},ticks:{color:'#aeb8d0',callback:v=>Number(v).toLocaleString('es-MX',{notation:'compact',maximumFractionDigits:1})}},y:{grid:{display:false},ticks:{color:'#d6def0',font:{size:10,weight:'600'},autoSkip:false}}}}});
 }
 function renderCharts(){
   if(!computed.length)return;Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};initAllianceChartDates();
   const makeBar=(id,rows,key,limit)=>{const rs=[...rows].sort((a,b)=>b[key]-a[key]).slice(0,limit);return new Chart(document.getElementById(id),{type:'bar',data:{labels:rs.map(r=>r.name),datasets:[{data:rs.map(r=>r[key]),borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}})};
   charts.meritos=makeBar('chMeritos',computed,'meritos',10);charts.muertes=makeBar('chMuertes',computed,'muertes',15);
   const est={PELEA:0,'NO APORTA':0,NUEVO:0,'SE FUE':0};computed.forEach(c=>est[c.status]++);
-  charts.estados=new Chart(document.getElementById('chEstados'),{type:'doughnut',data:{labels:Object.keys(est),datasets:[{data:Object.values(est)}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%'}});
+  charts.estados=new Chart(document.getElementById('chEstados'),{type:'doughnut',data:{labels:Object.keys(est),datasets:[{data:Object.values(est)}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{color:'#c5cee3',padding:12}}}}});
   charts.poder=makeBar('chPoder',computed,'poder',10);charts.curacion=makeBar('chCuracion',computed,'curadas',10);charts.muertesT4=makeBar('chMuertesT4',computed,'muertesT4',10);charts.muertesT5=makeBar('chMuertesT5',computed,'muertesT5',10);charts.curacionT4=makeBar('chCuracionT4',computed,'curadasT4',10);charts.curacionT5=makeBar('chCuracionT5',computed,'curadasT5',10);charts.construccion=makeBar('chConstruccion',computed,'construccion',10);charts.destruccion=makeBar('chDestruccion',computed,'destruccion',10);
   renderAllianceChart();
 }
