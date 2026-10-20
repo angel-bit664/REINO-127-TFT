@@ -441,6 +441,34 @@ body{background:radial-gradient(ellipse at 12% -8%,rgba(44,82,160,.13),transpare
 @media(max-width:1100px){.stats-grid-premium{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){.stats-grid-premium{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stats-grid-premium .stat-card{min-height:100px;padding:11px}.stats-grid-premium .stat-value{font-size:21px}.stats-grid-premium .stat-caption{font-size:8px}}
 
+
+/* REINO 127 · navegación y portada de campaña */
+:root{--steel:#8fa9c8;--gold:#e9c76a;--navy:#080e1b}
+#mainApp{min-height:100vh;background:radial-gradient(ellipse at 75% -10%,rgba(54,83,130,.16),transparent 45%),var(--bg)}
+.app-sidebar{position:fixed;z-index:150;left:0;top:0;bottom:0;width:226px;padding:18px 12px;background:linear-gradient(180deg,rgba(10,17,31,.98),rgba(12,17,29,.98));border-right:1px solid rgba(143,169,200,.2);display:flex;flex-direction:column;gap:8px;overflow:auto;backdrop-filter:blur(18px)}
+.sidebar-brand{display:flex;align-items:center;gap:11px;padding:8px 8px 18px;border-bottom:1px solid rgba(143,169,200,.16);margin-bottom:8px}
+.sidebar-crest{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;color:#f5d67e;font-size:21px;background:linear-gradient(145deg,#243650,#111b2c);border:1px solid rgba(233,199,106,.55);box-shadow:0 0 24px rgba(233,199,106,.09)}
+.sidebar-brand strong{display:block;font-size:13px;letter-spacing:1.3px;color:#f0d58b}.sidebar-brand small{display:block;color:#8da1bc;font-size:9px;margin-top:4px;letter-spacing:1px}
+.sidebar-caption{padding:9px 10px 3px;color:#62748e;font-size:8px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase}
+.side-link{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;text-align:left;background:transparent;border:1px solid transparent;border-radius:10px;color:#9aaac0;font-size:11px;font-weight:750;cursor:pointer;transition:.18s}
+.side-link i{width:17px;text-align:center;font-size:13px}.side-link:hover{background:rgba(113,153,207,.09);color:#e1eaf6}.side-link.active{background:linear-gradient(100deg,rgba(233,199,106,.15),rgba(85,123,174,.09));border-color:rgba(233,199,106,.28);color:#f1d887;box-shadow:inset 3px 0 #e9c76a}
+.sidebar-foot{margin-top:auto;padding:12px 10px;border-top:1px solid rgba(143,169,200,.15);font-size:9px;line-height:1.6;color:#667b97}.sidebar-foot b{color:#b9c8dc}
+#mainApp>.header,#mainApp>.upload-zone,#mainApp>#viewOnlyMsg,#mainApp>.cod-search-panel,#mainApp>.files-panel,#mainApp>.stats-grid-premium,#mainApp>.tabs-bar,#mainApp>#view-jugadores,#mainApp>#view-graficos,#mainApp>#view-listaroja,#mainApp>#view-inicio{margin-left:244px;margin-right:18px}
+#mainApp>.header{width:auto;min-height:82px;padding:13px 20px;background:linear-gradient(105deg,rgba(11,18,32,.98),rgba(20,32,51,.94)),radial-gradient(circle at 85% 50%,rgba(233,199,106,.13),transparent 38%);border:1px solid rgba(143,169,200,.18);border-top:0;border-radius:0 0 16px 16px;box-shadow:0 12px 30px rgba(0,0,0,.2)}
+.header:after{content:'TACTICAL INTELLIGENCE  •  KINGDOM 127';position:absolute;right:24px;bottom:7px;font-size:7px;letter-spacing:2px;color:rgba(180,198,220,.35);pointer-events:none}
+#mainApp>.upload-zone{margin-top:14px}
+#mainApp>.stats-grid-premium{margin-top:0}
+#mainApp>.tabs-bar{display:none}
+#view-inicio{margin-top:14px;margin-bottom:14px}
+.campaign-hero{position:relative;overflow:hidden;min-height:170px;padding:25px 28px;border-radius:18px;border:1px solid rgba(233,199,106,.3);background:linear-gradient(100deg,rgba(8,14,27,.98),rgba(18,31,51,.9) 55%,rgba(30,42,61,.75)),radial-gradient(ellipse at 88% 40%,rgba(233,199,106,.18),transparent 42%);box-shadow:0 16px 34px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:space-between;gap:20px}
+.campaign-hero:before{content:'⚔';position:absolute;right:8%;top:-50px;font-size:220px;line-height:1;color:rgba(233,199,106,.055);transform:rotate(-12deg);pointer-events:none}
+.campaign-kicker{font-size:9px;font-weight:900;letter-spacing:2.6px;color:#e9c76a;text-transform:uppercase}.campaign-title{font-size:clamp(23px,3vw,36px);font-weight:950;letter-spacing:1px;color:#f2f5fb;margin:8px 0 6px}.campaign-subtitle{font-size:11px;color:#9fb1c8;max-width:560px;line-height:1.7}.campaign-mark{position:relative;z-index:1;flex:0 0 104px;width:104px;height:104px;border:1px solid rgba(233,199,106,.45);border-radius:50%;display:grid;place-items:center;color:#f0d580;font-size:44px;background:radial-gradient(circle,rgba(233,199,106,.13),rgba(10,18,31,.3));box-shadow:0 0 36px rgba(233,199,106,.08),inset 0 0 20px rgba(233,199,106,.06)}
+.home-section-title{display:flex;align-items:center;gap:9px;margin:17px 0 10px;color:#c5d2e4;font-size:11px;font-weight:900;letter-spacing:1.3px;text-transform:uppercase}.home-section-title:after{content:'';height:1px;flex:1;background:linear-gradient(90deg,rgba(143,169,200,.3),transparent)}
+.home-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.shortcut-card{padding:15px;border-radius:13px;background:linear-gradient(145deg,rgba(25,37,57,.9),rgba(15,23,37,.95));border:1px solid rgba(143,169,200,.18);color:#b5c4d9;text-align:left;cursor:pointer;transition:.18s}.shortcut-card:hover{transform:translateY(-2px);border-color:rgba(233,199,106,.4)}.shortcut-card i{font-size:17px;color:#e9c76a;margin-bottom:11px}.shortcut-card b{display:block;color:#edf2fa;font-size:11px;margin-bottom:5px}.shortcut-card span{font-size:9px;line-height:1.6;color:#8194af}
+.redlist-panel{margin-bottom:18px;padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}.redlist-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.redlist-table{width:100%;border-collapse:collapse}.redlist-table td,.redlist-table th{padding:10px;border-bottom:1px solid var(--border);text-align:left}.redlist-remove{border:1px solid rgba(255,90,90,.25);background:rgba(255,90,90,.1);color:#ff858c;border-radius:7px;padding:6px 9px;cursor:pointer}
+@media(max-width:900px){.app-sidebar{width:190px}#mainApp>.header,#mainApp>.upload-zone,#mainApp>#viewOnlyMsg,#mainApp>.cod-search-panel,#mainApp>.files-panel,#mainApp>.stats-grid-premium,#mainApp>.tabs-bar,#mainApp>#view-jugadores,#mainApp>#view-graficos,#mainApp>#view-listaroja,#mainApp>#view-inicio{margin-left:205px;margin-right:12px}.campaign-mark{flex-basis:78px;width:78px;height:78px;font-size:32px}}
+@media(max-width:650px){.app-sidebar{top:auto;right:0;bottom:0;width:100%;height:68px;padding:5px 7px calc(5px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid rgba(143,169,200,.22);display:flex;flex-direction:row;align-items:stretch;gap:3px;overflow-x:auto;overflow-y:hidden;background:rgba(8,14,26,.97)}.sidebar-brand,.sidebar-caption,.sidebar-foot{display:none}.side-link{min-width:64px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:5px 3px;border-radius:8px;font-size:8px;white-space:nowrap;text-align:center}.side-link i{font-size:15px;width:auto}.side-link.active{box-shadow:inset 0 -2px #e9c76a}.side-link[data-page="administracion"],.side-link[data-page="snapshots"]{min-width:76px}#mainApp>.header,#mainApp>.upload-zone,#mainApp>#viewOnlyMsg,#mainApp>.cod-search-panel,#mainApp>.files-panel,#mainApp>.stats-grid-premium,#mainApp>.tabs-bar,#mainApp>#view-jugadores,#mainApp>#view-graficos,#mainApp>#view-listaroja,#mainApp>#view-inicio{margin-left:10px;margin-right:10px}#mainApp>.header{margin-bottom:10px;min-height:70px;padding:12px}.header:after{display:none}.campaign-hero{padding:20px 17px;min-height:150px}.campaign-mark{display:none}.campaign-subtitle{font-size:10px}.home-shortcuts{grid-template-columns:1fr}.app-main-bottom{height:76px}.stats-grid-premium{margin-bottom:18px!important}#view-inicio{margin-bottom:18px}}
+
 </style>
 </head>
 <body>
@@ -500,10 +528,30 @@ body{background:radial-gradient(ellipse at 12% -8%,rgba(44,82,160,.13),transpare
   </div>
 </div>
 <div id="mainApp" class="hidden">
+  <aside class="app-sidebar" aria-label="Navegación principal">
+    <div class="sidebar-brand"><div class="sidebar-crest">⚔</div><div><strong>REINO 127</strong><small>TFT · WAR INTELLIGENCE</small></div></div>
+    <div class="sidebar-caption">Centro de mando</div>
+    <button class="side-link active" data-page="inicio" onclick="appNavigate('inicio')"><i class="fas fa-house"></i><span>Inicio</span></button>
+    <button class="side-link" data-page="jugadores" onclick="appNavigate('jugadores')"><i class="fas fa-users"></i><span>Jugadores</span></button>
+    <button class="side-link" data-page="analisis" onclick="appNavigate('analisis')"><i class="fas fa-chart-line"></i><span>Análisis KVK</span></button>
+    <button class="side-link" data-page="vs" onclick="appNavigate('vs')"><i class="fas fa-code-compare"></i><span>Comparador VS</span></button>
+    <button class="side-link" data-page="lista-roja" onclick="appNavigate('lista-roja')"><i class="fas fa-crosshairs"></i><span>Lista Roja</span></button>
+    <div class="sidebar-caption">Datos y control</div>
+    <button class="side-link" data-page="snapshots" onclick="appNavigate('snapshots')"><i class="fas fa-box-archive"></i><span>Snapshots</span></button>
+    <button class="side-link oficial-only" data-page="administracion" onclick="appNavigate('administracion')"><i class="fas fa-sliders"></i><span>Administración</span></button>
+    <div class="sidebar-foot"><b>REINO 127 · TFT</b><br>Panel de inteligencia de batalla<br><span id="sidebarDataStatus">Esperando datos del KVK</span></div>
+  </aside>
   <header class="header">
     <div style="display:flex;gap:10px;align-items:center"><div style="width:42px;height:42px;border-radius:10px;background:var(--card);border:1px solid var(--border);display:grid;place-items:center">⚔️</div><div><div style="font-weight:900;color:var(--accent)">REINO 127</div><div style="font-size:9px;color:var(--muted)">TFT</div></div></div>
     <div style="display:flex;align-items:center;gap:8px"><span id="roleBadge" style="font-size:10px;font-weight:700;padding:5px 10px;border-radius:20px;background:var(--card);border:1px solid var(--border)"></span><button onclick="doLogout()" style="width:32px;height:32px;background:var(--card);border:1px solid var(--border);border-radius:50%;color:var(--muted);cursor:pointer"><i class="fas fa-right-from-bracket"></i></button></div>
   </header>
+  <section id="view-inicio" class="view-panel">
+    <div class="campaign-hero"><div><div class="campaign-kicker">Kingdom Intelligence System · TFT</div><div class="campaign-title">REINO 127</div><div class="campaign-subtitle">Centro de mando, análisis histórico y rendimiento de batalla. Datos organizados por snapshots diarios para evaluar la contribución real de cada jugador.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px"><span class="badge" style="background:rgba(233,199,106,.12);color:#e9c76a;border:1px solid rgba(233,199,106,.25)">KVK · HISTORIAL</span><span class="badge" style="background:rgba(111,178,255,.1);color:#8ec5ff;border:1px solid rgba(111,178,255,.2)">ANÁLISIS DIARIO</span></div></div><div class="campaign-mark">⚔</div></div>
+    <div class="home-section-title"><i class="fas fa-compass" style="color:#e9c76a"></i> Accesos rápidos</div>
+    <div class="home-shortcuts"><button class="shortcut-card" onclick="appNavigate('jugadores')"><i class="fas fa-users"></i><b>Registro de jugadores</b><span>Busca por nombre o ID, revisa estados y abre el historial individual.</span></button><button class="shortcut-card" onclick="appNavigate('analisis')"><i class="fas fa-chart-column"></i><b>Análisis del KVK</b><span>Rankings, evolución diaria, muertes, curación y aportaciones.</span></button><button class="shortcut-card" onclick="appNavigate('vs')"><i class="fas fa-scale-balanced"></i><b>Comparación VS</b><span>Compara el rendimiento de dos jugadores con métricas detalladas.</span></button></div>
+    <div class="home-section-title"><i class="fas fa-shield-halved" style="color:#e9c76a"></i> Estado de la información</div>
+    <div id="homeDataSummary" class="redlist-panel" style="font-size:11px;color:var(--muted)">Carga los snapshots o conecta con Supabase para consultar las estadísticas del reino.</div>
+  </section>
   <div class="upload-zone" id="uploadZone"><div style="color:var(--accent);font-weight:700"><i class="fas fa-cloud-arrow-up"></i> Arrastra tu ZIP aquí o click</div><div style="font-size:9px;color:var(--muted);margin-top:4px">R4/R5: los datos se guardan en Supabase para todo el reino</div><div id="fileInfo" style="margin-top:6px;color:var(--accent);font-size:10px;font-weight:700"></div><button id="syncBtn" class="btn-sm btn-export" style="margin:8px auto 0;display:inline-flex" onclick="syncCurrentData(event)"><i class="fas fa-cloud-arrow-up"></i> SINCRONIZAR CON SUPABASE</button><div id="memInfo" style="font-size:9px;color:var(--green);margin-top:4px"></div></div>
   <div id="viewOnlyMsg" class="hidden" style="margin:14px 16px;padding:10px;background:rgba(100,180,255,.1);border:1px solid rgba(100,180,255,.2);border-radius:10px;font-size:11px;color:#64b4ff;text-align:center"><i class="fas fa-eye"></i> Modo Miembro: Solo lectura</div>
   <input type="file" id="fileInput" accept=".zip,.xlsx,.xls" multiple hidden>
@@ -530,9 +578,11 @@ body{background:radial-gradient(ellipse at 12% -8%,rgba(44,82,160,.13),transpare
   <div class="files-panel oficial-only" id="filesPanel"><div class="files-header" onclick="toggleFilesPanel()"><div style="display:flex;align-items:center;gap:8px"><i class="fas fa-folder-open" style="color:var(--accent)"></i><span style="font-size:11px;font-weight:700">Archivos cargados</span><span id="fileCount" style="font-size:9px;color:var(--muted)">0</span></div><i class="fas fa-chevron-down" id="filesChevron" style="font-size:10px;color:var(--muted)"></i></div><div class="files-list" id="filesList"></div></div>
   <div class="stats-grid stats-grid-premium">
   <div class="stat-card kpi-blue"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-users"></i></span><span class="stat-label">Jugadores 20M+</span></div><div class="stat-value" id="sJ">—</div><div class="stat-caption">Jugadores que cumplen el mínimo de poder</div></div>
-  <div class="stat-card kpi-purple"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-bolt"></i></span><span class="stat-label">Poder máx. histórico total</span></div><div class="stat-value" id="sP">—</div><div class="stat-caption">Suma del máximo histórico de poder</div></div>
   <div class="stat-card kpi-red"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-skull"></i></span><span class="stat-label">Muertes</span></div><div class="stat-value" id="sD">—</div><div class="stat-caption">Muertes T4 y T5 registradas</div></div>
-  <div class="stat-card kpi-gold"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-chart-line"></i></span><span class="stat-label">Mérito promedio</span></div><div class="stat-value" id="sMP">—</div><div class="stat-caption">Promedio por jugador incluido</div></div>
+  <div class="stat-card kpi-red"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-skull-crossbones"></i></span><span class="stat-label">Muertes T4</span></div><div class="stat-value" id="sD4">—</div><div class="stat-caption">Muertes de tropas T4</div></div>
+  <div class="stat-card kpi-red"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-skull"></i></span><span class="stat-label">Muertes T5</span></div><div class="stat-value" id="sD5">—</div><div class="stat-caption">Muertes de tropas T5</div></div>
+  <div class="stat-card kpi-cyan"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-heart-pulse"></i></span><span class="stat-label">Curación T4</span></div><div class="stat-value" id="sC4">—</div><div class="stat-caption">Tropas T4 curadas</div></div>
+  <div class="stat-card kpi-cyan"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-heart"></i></span><span class="stat-label">Curación T5</span></div><div class="stat-value" id="sC5">—</div><div class="stat-caption">Tropas T5 curadas</div></div>
   <div class="stat-card kpi-gold"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-trophy"></i></span><span class="stat-label">Méritos totales</span></div><div class="stat-value" id="sMT">—</div><div class="stat-caption">Méritos propios acumulados</div></div>
   <div class="stat-card kpi-cyan"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-hammer"></i></span><span class="stat-label">Construcción</span></div><div class="stat-value" id="sC">—</div><div class="stat-caption">Tiempo total registrado</div></div>
   <div class="stat-card kpi-red"><div class="stat-topline"><span class="stat-icon"><i class="fas fa-fire"></i></span><span class="stat-label">Destrucción</span></div><div class="stat-value" id="sX">—</div><div class="stat-caption">Tiempo total registrado</div></div>
@@ -563,11 +613,13 @@ body{background:radial-gradient(ellipse at 12% -8%,rgba(44,82,160,.13),transpare
     <div class="chart-card alliance-chart-card"><div class="alliance-chart-head"><div class="chart-title" id="allianceChartTitle">Rendimiento general de la alianza</div><div class="alliance-chart-tools"><label for="allianceTopLimit">Mostrar jugadores</label><select id="allianceTopLimit" class="filter-sel" onchange="renderAllianceChart()"><option value="10">Top 10</option><option value="25" selected>Top 25</option><option value="50">Top 50</option><option value="all">Todos</option></select></div></div><div class="alliance-chart-wrap"><canvas id="chAlliance"></canvas></div><div id="allianceChartFoot" class="alliance-chart-foot"></div></div>
     <div class="charts-grid"><div class="chart-card"><div class="chart-title">Top 10 Méritos propios</div><div class="chart-wrap"><canvas id="chMeritos"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 15 Muertes T4 + T5</div><div class="chart-wrap"><canvas id="chMuertes"></canvas></div></div><div class="chart-card"><div class="chart-title">Distribución</div><div class="chart-wrap"><canvas id="chEstados"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Poder</div><div class="chart-wrap"><canvas id="chPoder"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Curación T4 + T5</div><div class="chart-wrap"><canvas id="chCuracion"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Muertes T4</div><div class="chart-wrap"><canvas id="chMuertesT4"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Muertes T5</div><div class="chart-wrap"><canvas id="chMuertesT5"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Curación T4</div><div class="chart-wrap"><canvas id="chCuracionT4"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Curación T5</div><div class="chart-wrap"><canvas id="chCuracionT5"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Construcción</div><div class="chart-wrap"><canvas id="chConstruccion"></canvas></div></div><div class="chart-card"><div class="chart-title">Top 10 Destrucción</div><div class="chart-wrap"><canvas id="chDestruccion"></canvas></div></div></div>
   </section>
+  <section id="view-listaroja" class="hidden"><div class="redlist-panel"><div class="redlist-toolbar"><div><div style="font-size:15px;font-weight:900;color:var(--accent)"><i class="fas fa-crosshairs"></i> LISTA ROJA · MONITOR KVK</div><div style="font-size:10px;color:var(--muted);margin-top:5px">Selecciona jugadores desde su ficha individual para mantenerlos en seguimiento en este navegador.</div></div><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn-sm btn-export oficial-only" onclick="exportRedList()"><i class="fas fa-file-excel"></i> Exportar Excel</button><button class="btn-sm oficial-only" onclick="clearRedList()"><i class="fas fa-trash"></i> Vaciar lista</button></div></div><div id="redListContent"></div></div></section>
   <div class="modal-overlay" id="modalOverlay"><div class="modal-content">
     <div style="display:flex;justify-content:space-between"><div><div style="font-weight:900;font-size:18px;color:var(--accent)" id="mName"></div><div style="font-size:10px;color:var(--muted)" id="mId"></div></div><button onclick="closeModal()" style="width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer"><i class="fas fa-xmark"></i></button></div>
     <div id="mStatus" style="padding:9px;border-radius:10px;font-weight:700;text-align:center;font-size:11px;margin:12px 0"></div>
     <div id="mStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px"></div>
     <div class="detail-total-box"><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Méritos Totales</div><div id="mTotalMeritos" style="font-weight:900;color:var(--accent);font-size:16px;margin-top:4px">0</div><div id="mTotalMeritosBreak" style="font-size:9px;color:var(--muted)"></div></div><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Muertes Totales</div><div id="mTotalMuertes" style="font-weight:900;color:var(--red);font-size:16px;margin-top:4px">0</div></div><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Construcción</div><div id="mTotalConstruccion" style="font-weight:900;color:var(--blue);font-size:16px;margin-top:4px">0</div></div><div class="detail-total-card"><div style="font-size:8px;color:var(--muted)">Destrucción</div><div id="mTotalDestruccion" style="font-weight:900;color:var(--red);font-size:16px;margin-top:4px">0</div></div></div>
+    <button id="redListToggleBtn" class="btn-sm" style="width:100%;justify-content:center;margin:10px 0;border-color:rgba(255,90,90,.3);color:#ff858c" onclick="toggleCurrentRedList()"><i class="fas fa-crosshairs"></i> Añadir a Lista Roja</button>
     <div class="oficial-only"><div style="font-size:10px;font-weight:700;color:var(--blue)"><i class="fas fa-sticky-note"></i> NOTA</div><textarea class="note-area" id="noteArea" placeholder="Ej: Vacaciones..."></textarea><button onclick="saveNote()" style="padding:6px 14px;background:var(--blue-d);border:1px solid rgba(100,180,255,.3);border-radius:8px;color:var(--blue);font-size:10px;font-weight:700;cursor:pointer"><i class="fas fa-save"></i> Guardar nota</button></div>
     <div class="detail-canvas-wrap"><div class="chart-title">Méritos por día</div><canvas id="mChartMeritos" height="160"></canvas></div>
     <div class="detail-canvas-wrap"><div class="chart-title">Muertes por día</div><canvas id="mChartMuertes" height="160"></canvas></div>
@@ -693,7 +745,7 @@ async function saveToStorage(){
 }
 function resetDashboardView(){
   computed=[];
-  const zeroIds=['sJ','sP','sD','sMP','sMT','sC','sX','cAll','cNA','cSF'];
+  const zeroIds=['sJ','sD','sMT','sC','sX','cAll','cNA','cSF'];
   zeroIds.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
   const body=document.getElementById('tBody');if(body)body.innerHTML='';
   const pagination=document.getElementById('pagination');if(pagination)pagination.innerHTML='';
@@ -954,6 +1006,7 @@ async function enterApp(){
     }
 
     if(typeof renderFilesList==='function') renderFilesList();
+    if(typeof appNavigate==='function') appNavigate('inicio');
 
     const pwd=document.getElementById('pwdSection');
     if(pwd) pwd.classList.remove('show');
@@ -1217,17 +1270,10 @@ function analyze(isLoad=false){
       .map(x=>({...x}));
     if(!h.length)continue;
 
-    // Los archivos históricos se manejan como snapshots acumulados.
-    // Convertimos a incrementos diarios únicamente esta copia usada para cálculos/gráficas.
-    // Esto mantiene iguales los resultados antes y después de sincronizar, sin restar dos veces.
-    const cumulativeKeys=['meritos','muertes','meritosEnemigos','infanteria','caballeria','arqueros','magos','otros','construccion','destruccion'];
-    for(let i=h.length-1;i>0;i--){
-      const prev=h[i-1],cur=h[i];
-      for(const k of cumulativeKeys){
-        const currentValue=num(cur[k]),previousValue=num(prev[k]);
-        cur[k]=currentValue>=previousValue ? currentValue-previousValue : currentValue;
-      }
-    }
+    // Los Excel del KVK contienen métricas por día, no snapshots acumulados.
+    // Se suman los valores diarios tal como vienen; restar el día anterior
+    // reduce indebidamente méritos, construcción y destrucción.
+    // No modificar h aquí: las mismas cifras deben salir antes y después de Supabase.
     const last=h[h.length-1];
     if(last.poder_maximo<config.poderMin)continue;
     const sum=k=>h.reduce((a,x)=>a+num(x[k]),0);
@@ -1264,13 +1310,40 @@ function analyze(isLoad=false){
   }
   computed.sort((a,b)=>b.meritos-a.meritos);computed.forEach((c,i)=>c.rango=i+1);
   document.getElementById('sJ').textContent=computed.filter(c=>c.status!=='SE FUE').length;
-  document.getElementById('sP').textContent=fmt(tP);document.getElementById('sD').textContent=fmt(tD);
-  document.getElementById('sMP').textContent=computed.length?fmt(tM/computed.length):'0';document.getElementById('sMT').textContent=fmt(tM);
+  document.getElementById('sD').textContent=fmt(tD);document.getElementById('sD4').textContent=fmt(computed.reduce((a,p)=>a+num(p.muertesT4),0));document.getElementById('sD5').textContent=fmt(computed.reduce((a,p)=>a+num(p.muertesT5),0));document.getElementById('sC4').textContent=fmt(computed.reduce((a,p)=>a+num(p.curadasT4),0));document.getElementById('sC5').textContent=fmt(computed.reduce((a,p)=>a+num(p.curadasT5),0));
+  document.getElementById('sMT').textContent=fmt(tM);
   document.getElementById('sC').textContent=fmtTime(tC);document.getElementById('sX').textContent=fmtTime(tX);
+  const summary=document.getElementById('homeDataSummary');
+  if(summary){
+    const ordered=[...fileParsed].sort((a,b)=>a.date-b.date);
+    const uniqueDates=[...new Set(ordered.map(f=>f.dateKey))].sort();
+    const duplicateDates=ordered.length-uniqueDates.length;
+    const gaps=[];
+    for(let i=1;i<uniqueDates.length;i++){
+      const a=new Date(uniqueDates[i-1]+'T12:00:00'),b=new Date(uniqueDates[i]+'T12:00:00');
+      const days=Math.round((b-a)/86400000);
+      if(days>1)gaps.push({from:uniqueDates[i-1],to:uniqueDates[i],days:days-1});
+    }
+    const missingDays=gaps.reduce((n,g)=>n+g.days,0);
+    const latest=ordered.length?ordered[ordered.length-1]:null;
+    const qualityColor=duplicateDates?'#ff858c':missingDays?'#e9c76a':'#54dfb4';
+    const qualityText=duplicateDates?`${duplicateDates} fecha(s) duplicada(s)`:missingDays?`${missingDays} día(s) sin snapshot en el rango`:'Sin duplicados ni saltos entre fechas cargadas';
+    summary.innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px;margin-bottom:12px">
+        <div class="detail-total-card"><div style="font-size:9px;color:var(--muted)">JUGADORES INCLUIDOS</div><div style="font-size:21px;font-weight:900;color:var(--text,#edf2fa);margin-top:5px">${computed.length}</div></div>
+        <div class="detail-total-card"><div style="font-size:9px;color:var(--muted)">SNAPSHOTS ÚNICOS</div><div style="font-size:21px;font-weight:900;color:var(--text,#edf2fa);margin-top:5px">${uniqueDates.length}</div></div>
+        <div class="detail-total-card"><div style="font-size:9px;color:var(--muted)">ÚLTIMO REGISTRO</div><div style="font-size:13px;font-weight:850;color:var(--text,#edf2fa);margin-top:8px">${latest?dayLabel(latest.date):'Sin datos'}</div></div>
+        <div class="detail-total-card"><div style="font-size:9px;color:var(--muted)">DÍAS FALTANTES</div><div style="font-size:21px;font-weight:900;color:${missingDays?'#e9c76a':'#54dfb4'};margin-top:5px">${missingDays}</div></div>
+      </div>
+      <div style="padding:10px 12px;border:1px solid ${qualityColor}44;border-radius:10px;background:${qualityColor}0d;color:${qualityColor};font-weight:800"><i class="fas ${duplicateDates?'fa-triangle-exclamation':missingDays?'fa-calendar-xmark':'fa-circle-check'}"></i> Calidad de datos: ${qualityText}</div>
+      ${gaps.length?`<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--muted);font-weight:750">Ver saltos de fechas (${gaps.length})</summary><div style="display:grid;gap:5px;margin-top:8px">${gaps.slice(0,12).map(g=>`<div style="display:flex;justify-content:space-between;gap:8px"><span>${dayLabel(new Date(g.from+'T12:00:00'))} → ${dayLabel(new Date(g.to+'T12:00:00'))}</span><b>${g.days} día(s)</b></div>`).join('')}${gaps.length>12?`<div>y ${gaps.length-12} intervalos más…</div>`:''}</div></details>`:''}
+      <div style="font-size:9px;color:var(--muted);margin-top:10px">Rango: ${ordered.length?dayLabel(ordered[0].date)+' — '+dayLabel(ordered[ordered.length-1].date):'Sin rango disponible'} · La detección solo evalúa fechas de archivos cargados; no modifica ni sincroniza datos.</div>`;
+  }
+  const sideStatus=document.getElementById('sidebarDataStatus');if(sideStatus)sideStatus.textContent=fileParsed.length?`${fileParsed.length} snapshots · ${computed.length} jugadores`:'Esperando datos del KVK';
   document.getElementById('cAll').textContent=computed.length;
   document.getElementById('cNA').textContent=computed.filter(c=>c.status==='NO APORTA').length;
   document.getElementById('cSF').textContent=computed.filter(c=>c.status==='SE FUE').length;
-  currentPage=1;renderTable();fillCompareSelects();
+  currentPage=1;renderTable();fillCompareSelects();renderRedList();
 }
 
 function fmtTime(sec){
@@ -1278,7 +1351,30 @@ function fmtTime(sec){
   if(d)return `${d}d ${String(h).padStart(2,'0')}h`;if(h)return `${h}h ${String(m).padStart(2,'0')}m`;if(m)return `${m}m ${String(s).padStart(2,'0')}s`;return `${s}s`;
 }
 function dayLabel(d){return new Date(d).toLocaleDateString('es-MX',{day:'2-digit',month:'short'}).replace('.','').toUpperCase();}
+// Navegación principal y Lista Roja local del navegador.
+let currentAppPage='inicio';
+function getRedList(){try{return JSON.parse(localStorage.getItem('reino127_redlist')||'[]').map(String)}catch(e){return []}}
+function saveRedList(ids){try{localStorage.setItem('reino127_redlist',JSON.stringify([...new Set(ids.map(String))]));}catch(e){toast('No se pudo guardar la Lista Roja en este navegador','error')}}
+function toggleCurrentRedList(){if(!currentModalId)return;let ids=getRedList();const id=String(currentModalId);ids=ids.includes(id)?ids.filter(x=>x!==id):[...ids,id];saveRedList(ids);const b=document.getElementById('redListToggleBtn');if(b){const on=ids.includes(id);b.innerHTML=on?'<i class="fas fa-check"></i> En Lista Roja · Quitar':'<i class="fas fa-crosshairs"></i> Añadir a Lista Roja';b.style.background=on?'rgba(255,90,90,.12)':'transparent'}renderRedList();toast(ids.includes(id)?'Jugador añadido a Lista Roja':'Jugador retirado de Lista Roja')}
+function renderRedList(){const root=document.getElementById('redListContent');if(!root)return;const ids=getRedList();const rows=ids.map(id=>computed.find(p=>String(p.id)===id)).filter(Boolean);if(!rows.length){root.innerHTML='<div style="padding:25px 12px;text-align:center;color:var(--muted);font-size:11px"><i class="fas fa-crosshairs" style="font-size:24px;color:#ff858c;display:block;margin-bottom:10px"></i>La Lista Roja está vacía.<br>Abre la ficha de un jugador y pulsa “Añadir a Lista Roja”.</div>';return}root.innerHTML=`<div style="overflow:auto"><table class="redlist-table"><thead><tr><th>Jugador</th><th>ID</th><th>Poder actual</th><th>Méritos</th><th>Muertes T4/T5</th><th>Curación T4/T5</th><th>Estado</th><th>Acción</th></tr></thead><tbody>${rows.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.id)}</td><td>${fmt(p.poderActual||0)}</td><td>${fmt(p.meritos)}</td><td>${fmt(p.muertesT4)} / ${fmt(p.muertesT5)}</td><td>${fmt(p.curadasT4)} / ${fmt(p.curadasT5)}</td><td>${esc(p.status)}</td><td><button class="redlist-remove" onclick="removeRedListPlayer('${esc(p.id)}')">Quitar</button></td></tr>`).join('')}</tbody></table></div><div style="font-size:9px;color:var(--muted);margin-top:9px">${rows.length} jugadores en seguimiento · La selección se guarda localmente en este navegador.</div>`}
+function removeRedListPlayer(id){saveRedList(getRedList().filter(x=>x!==String(id)));renderRedList();toast('Jugador retirado de Lista Roja')}
+function clearRedList(){if(!confirm('¿Vaciar la Lista Roja de este navegador?'))return;saveRedList([]);renderRedList()}
+function exportRedList(){const ids=getRedList();const rows=ids.map(id=>computed.find(p=>String(p.id)===id)).filter(Boolean);if(!rows.length){toast('La Lista Roja está vacía','error');return}const data=rows.map(p=>({'Nombre':p.name,'ID':p.id,'Poder actual':p.poderActual,'Poder máximo histórico':p.poder,'Méritos propios':p.meritos,'Muertes T4':p.muertesT4,'Muertes T5':p.muertesT5,'Curación T4':p.curadasT4,'Curación T5':p.curadasT5,'Construcción':fmtTime(p.construccion),'Destrucción':fmtTime(p.destruccion),'Estado':p.status,'Nota':playerNotes[p.id]||''}));const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Lista Roja');XLSX.writeFile(wb,`REINO127_Lista_Roja_${new Date().toISOString().slice(0,10)}.xlsx`)}
+function appNavigate(page){
+ currentAppPage=page;document.querySelectorAll('.side-link').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+ ['view-inicio','view-jugadores','view-graficos','view-listaroja'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
+ const hideData=false;document.querySelector('.stats-grid-premium')?.classList.toggle('hidden',hideData);
+ if(page==='inicio'){document.getElementById('view-inicio').classList.remove('hidden')}
+ else if(page==='jugadores'){document.querySelector('.stats-grid-premium')?.classList.remove('hidden');document.getElementById('view-jugadores').classList.remove('hidden');document.getElementById('filterEstado').value='all';currentPage=1;renderTable()}
+ else if(page==='analisis'){document.querySelector('.stats-grid-premium')?.classList.remove('hidden');document.getElementById('view-graficos').classList.remove('hidden');setTimeout(renderCharts,100)}
+ else if(page==='vs'){openCompare();return}
+ else if(page==='lista-roja'){document.getElementById('view-listaroja').classList.remove('hidden');renderRedList()}
+ else if(page==='snapshots'){const el=document.getElementById('filesPanel');el?.scrollIntoView({behavior:'smooth',block:'start'});if(el){el.querySelector('.files-list')?.classList.add('open');document.getElementById('filesChevron')?.classList.add('fa-rotate-180')}document.getElementById('view-inicio')?.classList.remove('hidden');document.getElementById('homeDataSummary')?.scrollIntoView({behavior:'smooth',block:'center'});return}
+ else if(page==='administracion'){document.getElementById('uploadZone')?.scrollIntoView({behavior:'smooth',block:'center'});if(session?.level>=2)openConfig();return}
+ window.scrollTo({top:0,behavior:'smooth'});
+}
 function switchTab(tab){
+  if(tab==='graficos'){appNavigate('analisis');return;} if(tab==='jugadores'||tab==='noaportan'||tab==='sefueron'){currentAppPage='jugadores';document.querySelectorAll('.side-link').forEach(b=>b.classList.toggle('active',b.dataset.page==='jugadores'));document.getElementById('view-inicio')?.classList.add('hidden');document.getElementById('view-listaroja')?.classList.add('hidden');document.querySelector('.stats-grid-premium')?.classList.remove('hidden');}
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
   document.getElementById('view-jugadores').classList.add('hidden');document.getElementById('view-graficos').classList.add('hidden');
   if(tab==='jugadores'){document.getElementById('view-jugadores').classList.remove('hidden');document.getElementById('filterEstado').value='all';}
@@ -1388,6 +1484,7 @@ function openModal(id){
   document.getElementById('mTotalMeritos').textContent=fmt(acumM);document.getElementById('mTotalMeritosBreak').textContent=`${histSorted.length} días • ${pct.toFixed(2)}% del poder`;
   document.getElementById('mTotalMuertes').textContent=fmt(acumD);document.getElementById('mTotalConstruccion').textContent=fmtTime(acumC);document.getElementById('mTotalDestruccion').textContent=fmtTime(acumX);
   document.getElementById('noteArea').value=playerNotes[id]||'';
+  const redBtn=document.getElementById('redListToggleBtn');if(redBtn){const inRed=getRedList().includes(id);redBtn.innerHTML=inRed?'<i class="fas fa-check"></i> En Lista Roja · Quitar':'<i class="fas fa-crosshairs"></i> Añadir a Lista Roja';redBtn.style.background=inRed?'rgba(255,90,90,.12)':'transparent';}
   let hhtml='';for(let i=histSorted.length-1;i>=0;i--){const h=histSorted[i];hhtml+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(30,35,64,.5)"><div><div style="font-weight:700;font-size:11px">${dayLabel(h.date)}</div><div style="font-size:9px;color:var(--muted)">${esc(h.fileName)}</div></div><div style="text-align:right"><div style="color:var(--accent);font-weight:700">+${fmt(h.meritos)} méritos</div><div style="color:var(--red);font-size:10px">+${fmt(h.muertes)} muertes</div><div style="color:var(--blue);font-size:9px">🏗️ ${fmtTime(h.construccion)} · ⚔️ ${fmtTime(h.destruccion)}</div></div></div>`;}document.getElementById('mHist').innerHTML=hhtml;
   const troopData=[p.infanteria,p.caballeria,p.arqueros,p.magos,p.otros],troopLabels=['Infantería','Caballería','Arqueros','Magos','Otros'];
   const troopDays=histSorted.filter(h=>h.tropasDisponibles!==false).length;
